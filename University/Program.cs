@@ -11,9 +11,11 @@ namespace University
             Field newField = new Field();
             //newField.ectsTotalProperty = 300;
             //Console.WriteLine(newField.ectsTotalProperty);
-            int year = DateTime.Now.Year;
-            short yearshort = Convert.ToInt16(year);
-            Console.WriteLine(yearshort.GetType());
+            // int year = DateTime.Now.Year;
+            // short yearshort = Convert.ToInt16(year);
+            // Console.WriteLine(yearshort.GetType());
+            newField.CreateField();
+            //Console.WriteLine(newField.ectsTotalProperty);
         }
     }
  

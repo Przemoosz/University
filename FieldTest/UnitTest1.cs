@@ -114,12 +114,14 @@ public class EctsTests
 public class YearTest
 {
     // Testing if YearProperty (Starting/Ending) works fine
-    // Starting year should not be smaller thank: current Year - 7
-    // Ending Year should not be greater than current Year + 7
+    // Starting year should not be smaller than: current Year - 7
+    // Starting year should not be greater than: current Year + 7
+    // Ending Year should not be greater than: starting year + 7
+    // Ending Year should not be smaller than: starting year
     [TestMethod]
     public void YearStarting_Provided_correctly()
     {
-        // Testing if EctsTotal get and set works properly 
+        // Testing if StartingYearProperty get and set works properly 
         
         // Arrange Section
         short yearTest= 2021;
@@ -139,7 +141,7 @@ public class YearTest
         // Property should raise Argument Exception
         
         // Arrange Section
-        short minYear = Convert.ToInt16(DateTime.Now.Year - 7);
+        short minYear = Convert.ToInt16(DateTime.Now.Year - 8);
         Field testField = new Field();
         
         // Act and Assert Section
@@ -153,10 +155,118 @@ public class YearTest
         // Property should raise Argument Exception
         
         // Arrange Section
-        short maxYear = Convert.ToInt16(DateTime.Now.Year + 7);
+        short maxYear = Convert.ToInt16(DateTime.Now.Year + 8);
         Field testField = new Field();
         
         // Act and Assert Section
         Assert.ThrowsException<ArgumentException>(() => testField.yearStartingProperty = maxYear);
     }
+
+    [TestMethod]
+    public void YearEnding_Provided_Correctly()
+    {
+        // Testing if StartingYearProperty get and set works properly 
+        
+        // Arrange Section
+        short testEndingYear = 2025;
+        Field testField = new Field();
+        testField.yearStartingProperty = 2021;
+        
+        // Act Section
+        testField.yearEndingProperty = testEndingYear;
+        
+        // Assert Section
+        Assert.AreEqual(testEndingYear,testField.yearEndingProperty);
+    }
+
+    [TestMethod]
+    public void YearEnding_Lower_Than_YearStarting()
+    {
+        // Testing protection against providing endingYear lower than startingYear
+        // Property should raise ArgumentException
+        
+        // Arrange Section
+        short testStartingYear = 2021;
+        short testingEndingYear = 1970;
+        Field testField = new Field();
+        testField.yearStartingProperty = testStartingYear;
+        
+        // Act and Assert Section
+        Assert.ThrowsException<ArgumentException>(() => testField.yearEndingProperty = testingEndingYear);
+    }
+
+    [TestMethod]
+    public void YearEnding_Greater_Than_Upper_Limit()
+    {
+        // Testing protection against providing endingYear greater than startingYear +7
+        // Property should raise ArgumentException
+        
+        // Arrange Section
+        short testStartingYear = 2021;
+        short testEndingYear = 2029;
+        Field testField = new Field();
+        testField.yearStartingProperty = testStartingYear;
+        
+        // Act and Assert Section
+        Assert.ThrowsException<ArgumentException>(() => testField.yearEndingProperty = testEndingYear);
+    }
+}
+
+[TestClass]
+public class TitleTests
+{
+    // Title set will be handled by other function which will be also tested
+    // For now only 2 titles are available "Engineer Degree"(ED) and "Master Engineer Degree"(MED)
+    // If providing method return something else Exception should be raised
+    [TestMethod]
+    public void Title_ED_got_correctly()
+    {
+        // Testing set and get method if provide method return "Engineer Degree"
+        
+        // Arrange Section
+        Field testField = new Field();
+        string testTitle = "Engineer Degree";
+        
+        // Act Section
+        testField.titleProperty = testTitle;
+        
+        // Assert Section
+        Assert.AreEqual(testTitle,testField.titleProperty);
+        
+    }
+    [TestMethod]
+    public void Title_MED_got_correctly()
+    {
+        // Testing set and get method if provide method return "Master Engineer Degree"
+        
+        // Arrange Section
+        Field testField = new Field();
+        string testTitle = "Master Engineer Degree";
+        
+        // Act Section
+        testField.titleProperty = testTitle;
+        
+        // Assert Section
+        Assert.AreEqual(testTitle,testField.titleProperty);
+    }
+
+    [TestMethod]
+    public void Title_Provided_Not_Correctly()
+    {
+        // Testing protection if providing method returns different value than 2 fixed degree (MED and ED)
+        // Property should raise ArgumentException
+        
+        // Arrange Section
+        string testTitle = "Wrong Title";
+        Field testField = new Field();
+        
+        // Act and Asser Section
+        Assert.ThrowsException<ArgumentException>(() => testField.titleProperty = testTitle);
+    }
+}
+
+[TestClass]
+public class EctsInputTest
+{
+    
 }
