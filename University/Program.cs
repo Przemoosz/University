@@ -6,16 +6,16 @@ namespace University
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine("".Length);
+            bool[] t = new bool[2] {false, false};
+            bool[] s = new bool[2] {false, false};
+            Console.WriteLine(t == s);
             // TestingCode.DbConnect();
             Field newField = new Field();
-            //newField.ectsTotalProperty = 300;
-            //Console.WriteLine(newField.ectsTotalProperty);
-            // int year = DateTime.Now.Year;
-            // short yearshort = Convert.ToInt16(year);
-            // Console.WriteLine(yearshort.GetType());
-            newField.CreateField();
-            //Console.WriteLine(newField.ectsTotalProperty);
+            // newField.DropTable();
+            // newField.CreateTable();
+            // newField.TableExists();
+            // newField.DataInsertion();
+            // newField.TableExists();
         }
     }
  

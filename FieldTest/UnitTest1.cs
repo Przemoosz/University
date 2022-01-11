@@ -1,6 +1,8 @@
 using System;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using University;
+using Npgsql;
 namespace FieldTest;
 
 [TestClass]
@@ -266,7 +268,110 @@ public class TitleTests
 }
 
 [TestClass]
-public class EctsInputTest
+public class DatabaseTest
 {
-    
+    // Testing tables in database
+    // Field class should handle: CREATE, DROP, IF EXISTS method
+    // Every test creates table first and after fetching result it drops table (or drops table before and after act section)
+    // IMPORTANT NOTE: Running this test will drop whole table using CASCADE method (This includes other tables data)
+    // After running test all your data will be lost!
+    [TestMethod]
+    public void Testing_Table_Creation()
+    {
+        // Testing CreateTable method 
+        
+        // Arrange Section
+        Field testingField = new Field();
+        bool exists;
+        // Act Section
+        testingField.CreateTable();
+        using (NpgsqlCommand command = new NpgsqlCommand())
+        {
+            using (NpgsqlConnection connection =
+                   new NpgsqlConnection("Host=localhost;Username=test;Password=testpassword;Database=university;"))
+            {
+                connection.Open();
+                command.Connection = connection;
+                // First drop table
+                command.CommandText = "DROP TABLE IF EXISTS fields;";
+                command.ExecuteNonQuery();
+                // Test CreateTable Method from Field Class
+                testingField.CreateTable();
+                // Fetch result if table exists
+                command.CommandText =
+                    "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='fields')";
+                exists = Convert.ToBoolean(command.ExecuteScalar().ToString());
+                // Drop table
+                command.CommandText = "DROP TABLE IF EXISTS fields;";
+                command.ExecuteNonQuery();
+                connection.Close();
+            }
+        }
+        // Assert Section
+        Assert.AreEqual(true,exists);
+    }
+
+    [TestMethod]
+    public void Testing_Table_Drop()
+    {
+        // Testing DropTable method
+        
+        // Arrange Section
+        TestUtils.TableDrop();
+        TestUtils.SimpleTableCreate();
+        Field testField = new Field();
+        bool result;
+        
+        // Act Section
+        testField.DropTable();
+        result = TestUtils.TableExists();
+        
+        // Assert Section
+        Assert.AreEqual(false,result);
+    }
+    [TestMethod]
+    public void Testing_Table_Exists()
+    {
+        // Testing TableExists method
+        // Table fields will exist so method should return true
+        
+        // Arrange Section
+        TestUtils.TableDrop();
+        TestUtils.SimpleTableCreate();
+        Field testField = new Field();
+        bool result;
+        
+        // Act Section
+        result = testField.TableExists();
+        
+        // Assert Section
+        Assert.AreEqual(true,result);
+        
+
+    }
+    [TestMethod]
+    public void Testing_Table_Dont_Exists()
+    {
+        // Testing TableExist Method
+        // Table "fields" won't exist so method should return false
+        
+        // Arrange Section
+        TestUtils.TableDrop();
+        Field testField = new Field();
+        bool result;
+        
+        // Act Section
+        result = testField.TableExists();
+        
+        // Assert Section
+        Assert.AreEqual(false,result);
+    }
+
+    [TestMethod]
+    public void Testing_Data_Insertion()
+    {
+        // Inserting specified data, and testing if DataInsertion method
+        // inserted value in correct way.
+        
+    }
 }

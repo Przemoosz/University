@@ -1,8 +1,12 @@
 ﻿using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
+using Npgsql;
+using NpgsqlTypes;
 
 namespace University;
 
-public class Field
+
+public class Field : IData
 {
     private string name = "None";
     private short ectsTotal = 0;
@@ -84,9 +88,10 @@ public class Field
         ProvideStartingYear();
         ProvideEndingYear();
         ProvideTitle();
-    }      
+        
+    }
 
-    private void ProvideName()
+    public void ProvideName()
     {
         string providedName; 
         Console.WriteLine("Field name (Must be provided, not longer than 255 letters)");
@@ -165,4 +170,95 @@ public class Field
             _ => "None"
         };
     }
+
+    public void CreateTable()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = @"CREATE TABLE IF NOT EXISTS fields
+            (id SERIAL PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                ectsTotal SMALLINT NOT NULL,
+                ectsObtained SMALLINT DEFAULT 0,
+                startingYear SMALLINT NOT NULL,
+                endingYear SMALLINT NOT NULL CHECK( endingYear <= startingYear+7 AND endingYear>startingYear),
+                title VARCHAR(255) NOT NULL
+            );";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd,connection))
+            {
+                command.ExecuteScalar();
+            }
+            connection.Close();
+        }
+    }
+
+    public bool TableExists()
+    {
+        bool ret = false;
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='fields')";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                var result = command.ExecuteScalar();
+                string res = result.ToString();
+                ret = Convert.ToBoolean(res);
+                // Console.WriteLine(ret);
+            }
+            connection.Close();
+        }
+
+        return ret;
+    }
+    public void DropTable()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "DROP TABLE IF EXISTS fields CASCADE;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd,connection))
+            {
+                command.ExecuteScalar();
+            }
+            connection.Close();
+        }
+    }
+
+    public void DataInsertion()
+    {
+        if (!TableExists()) CreateTable();
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "INSERT INTO fields VALUES(DEFAULT ,@Name, @EctsTotal, DEFAULT, @StartingYear, @EndingYear,@Title);";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                command.Parameters.Add("@Name", NpgsqlDbType.Varchar);
+                command.Parameters.Add("@EctsTotal",NpgsqlDbType.Smallint);
+                command.Parameters.Add("@StartingYear", NpgsqlDbType.Smallint);
+                command.Parameters.Add("@EndingYear", NpgsqlDbType.Smallint);
+                command.Parameters.Add("@Title", NpgsqlDbType.Varchar);
+                command.Parameters["@Name"].Value = nameProperty;
+                command.Parameters["@EctsTotal"].Value = ectsTotalProperty;
+                command.Parameters["@StartingYear"].Value = yearStartingProperty;
+                command.Parameters["@EndingYear"].Value = yearEndingProperty;
+                command.Parameters["@Title"].Value = titleProperty;
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    connection.Close();
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }
+            connection.Close();
+            
+        }
+    }
+    
 }
