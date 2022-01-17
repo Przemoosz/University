@@ -8,14 +8,19 @@ namespace University
         {
             bool[] t = new bool[2] {false, false};
             bool[] s = new bool[2] {false, false};
-            Console.WriteLine(t == s);
-            // TestingCode.DbConnect();
-            Field newField = new Field();
-            // newField.DropTable();
+            // Field newField = new Field();
             // newField.CreateTable();
+            // newField.DropTable();
+            // Random rndInt = new Random();
+            // for (int xxx =0; xxx<50; xxx++)
+            // {
+            //     Console.WriteLine(rndInt.Next(1,10));
+            // }
             // newField.TableExists();
             // newField.DataInsertion();
-            // newField.TableExists();
+            Semester sem = new Semester("MhED");
+            sem.nameProperty = "Semester I";
+            Console.WriteLine(sem.nameProperty);
         }
     }
  

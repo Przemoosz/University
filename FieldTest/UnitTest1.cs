@@ -293,7 +293,7 @@ public class DatabaseTest
                 connection.Open();
                 command.Connection = connection;
                 // First drop table
-                command.CommandText = "DROP TABLE IF EXISTS fields;";
+                command.CommandText = "DROP TABLE IF EXISTS fields CASCADE;";
                 command.ExecuteNonQuery();
                 // Test CreateTable Method from Field Class
                 testingField.CreateTable();
@@ -373,5 +373,60 @@ public class DatabaseTest
         // Inserting specified data, and testing if DataInsertion method
         // inserted value in correct way.
         
+        // Arrange Section
+        Field testingField = new Field();
+        string testName = "TestName";
+        string testTitle = "Engineer Degree";
+        short testEctsTotal = 43;
+        short testStartingYear = 2021;
+        short testEndingYear = 2024;
+                   
+        int id;
+        string NameFetched;
+        short EctsTotalFetched;
+        short EctsObtainedFetched;
+        short StartingYearFetched;
+        short EndingYearFetched;
+        string TitleFetched;        
+        TestUtils.TableDrop();
+        
+        // Act Section
+        testingField.CreateTable();
+        testingField.nameProperty = testName;
+        testingField.titleProperty = testTitle;
+        testingField.ectsTotalProperty = testEctsTotal;
+        testingField.yearStartingProperty = testStartingYear;
+        testingField.yearEndingProperty = testEndingYear;
+        testingField.DataInsertion();
+        
+        // Fetching data from DB
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string command = "SELECT * FROM fields;";
+            using (NpgsqlCommand cmd = new NpgsqlCommand(command, connection))
+            {
+                var resultObject = cmd.ExecuteReader();
+                resultObject.Read();
+                id = resultObject.GetInt32(0);
+                NameFetched = resultObject.GetString(1);         
+                EctsTotalFetched = resultObject.GetInt16(2);     
+                EctsObtainedFetched = resultObject.GetInt16(3);  
+                StartingYearFetched = resultObject.GetInt16(4);  
+                EndingYearFetched = resultObject.GetInt16(5);    
+                TitleFetched = resultObject.GetString(6);          
+                
+            }
+            connection.Close();
+        }
+        // Assert Section
+        Assert.AreEqual(1,id);
+        Assert.AreEqual(testName,NameFetched);
+        Assert.AreEqual(testEctsTotal,EctsTotalFetched);
+        Assert.AreEqual(0,EctsObtainedFetched); 
+        Assert.AreEqual(testStartingYear,StartingYearFetched); 
+        Assert.AreEqual(testEndingYear,EndingYearFetched); 
+        Assert.AreEqual(testTitle,TitleFetched); 
+        TestUtils.TableDrop();
     }
 }

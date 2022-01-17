@@ -66,7 +66,7 @@ public class Field : IData
             if (value < yearStarting) throw new ArgumentException($"University ending year should not be lower than {yearStarting}");
             else if (value > yearStarting + 7)
                 throw new ArgumentException($"University ending year should not be greater than {yearStarting +7}");
-            else yearStarting = value;
+            else yearEnding = value;
         }
     }
 
@@ -81,14 +81,19 @@ public class Field : IData
         }
     }
 
+    public Field()
+    {
+        //CreateTable();
+    }
     public void CreateField()
     {
+        
         ProvideName();
         ProvideEcstTotal();
         ProvideStartingYear();
         ProvideEndingYear();
         ProvideTitle();
-        
+        DataInsertion();
     }
 
     public void ProvideName()
@@ -195,7 +200,7 @@ public class Field : IData
 
     public bool TableExists()
     {
-        bool ret = false;
+        bool ret;
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
         {
             connection.Open();
@@ -205,7 +210,7 @@ public class Field : IData
                 var result = command.ExecuteScalar();
                 string res = result.ToString();
                 ret = Convert.ToBoolean(res);
-                // Console.WriteLine(ret);
+                Console.WriteLine(ret);
             }
             connection.Close();
         }
@@ -257,7 +262,26 @@ public class Field : IData
                 }
             }
             connection.Close();
-            
+        }
+    }
+
+    public static void AllFieldsInDatabase()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT * FROM fields;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                var result = command.ExecuteReader();
+                // Console.WriteLine(result.Re);
+                Console.WriteLine("ID -- Name -- EctsTotal -- EctsObtained -- StartingYear -- EndingYear -- Title");
+                foreach (var _ in result)
+                {
+                    Console.WriteLine($"{result.GetInt32(0)} -- {result.GetString(1)} -- {result.GetInt16(2)} -- {result.GetInt16(3)} -- {result.GetInt16(4)} -- {result.GetInt16(5)} -- {result.GetString(6)}");
+                }
+            }
+            connection.Close();
         }
     }
     
