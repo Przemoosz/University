@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Data.Common;
+using System.Diagnostics;
 using System.Reflection.Metadata.Ecma335;
 using Npgsql;
 using NpgsqlTypes;
@@ -14,6 +15,7 @@ public class Field : IData
     private short yearStarting = Convert.ToInt16(DateTime.Now.Year);
     private short yearEnding = Convert.ToInt16(DateTime.Now.Year+3);
     private string title = "None";
+    private int _fieldId;
 
     public string nameProperty
     {
@@ -81,6 +83,10 @@ public class Field : IData
         }
     }
 
+    public int fieldIdProperty
+    {
+        get => _fieldId;
+    }
     public Field()
     {
         //CreateTable();
@@ -237,7 +243,7 @@ public class Field : IData
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
         {
             connection.Open();
-            string cmd = "INSERT INTO fields VALUES(DEFAULT ,@Name, @EctsTotal, DEFAULT, @StartingYear, @EndingYear,@Title);";
+        string cmd = "INSERT INTO fields VALUES(DEFAULT ,@Name, @EctsTotal, DEFAULT, @StartingYear, @EndingYear,@Title) RETURNING id;";
             using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
             {
                 command.Parameters.Add("@Name", NpgsqlDbType.Varchar);
@@ -252,10 +258,12 @@ public class Field : IData
                 command.Parameters["@Title"].Value = titleProperty;
                 try
                 {
-                    command.ExecuteNonQuery();
+                    Object reader = command.ExecuteScalar();
+                    _fieldId = Convert.ToInt32(reader);
                 }
                 catch (Exception ex)
                 {
+                    
                     connection.Close();
                     Console.WriteLine(ex);
                     throw;

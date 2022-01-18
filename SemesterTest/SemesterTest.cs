@@ -39,7 +39,7 @@ public class NameTesting
         string[] testingSemesterNames = new string[7] {"Semester I","Semester II","Semester III","Semester IV","Semester V","Semester VI","Semester VII"};
         Semester testSemester = new Semester("ED");
         Random rndIndexGenerator = new Random();
-        int rndIndex = rndIndexGenerator.Next(0, 8);
+        int rndIndex = rndIndexGenerator.Next(0, 7);
         
         // Act Section
         string testingName = testingSemesterNames[rndIndex];
@@ -76,7 +76,7 @@ public class NameTesting
         int rndIndex;
         
         // Act Section
-        rndIndex = rndIndexGenerator.Next(0, 3);
+        rndIndex = rndIndexGenerator.Next(0, 2);
         string generatedName = testingSemesterNames[rndIndex];
         testSemester.nameProperty = generatedName;
         
@@ -132,5 +132,71 @@ public class NameTesting
         
         // Act and Arrange Section 
         Assert.ThrowsException<ArgumentException>(() => testSemester.nameProperty = name);
+    }
+}
+
+[TestClass]
+public class EctsTest
+{
+    // Testing ectsTotalProperty in Semester class
+    // Test works for title ED and MED
+    [TestMethod]
+    public void Ects_Provided_Correctly()
+    {
+        // Testing set and get property
+        
+        // Arrange Section
+        Semester testSemester = new Semester("ED");
+        short ectsTest = 24;
+        
+        // Act Section
+        testSemester.ecstTotalProperty = ectsTest;
+        
+        // Assert Section
+        Assert.AreEqual(ectsTest,testSemester.ecstTotalProperty);
+    }
+
+    [TestMethod]
+    public void Ects_Set_Negative()
+    {
+        // Testing protection against providing negative ects 
+        // Property should raise Argument Exception
+        
+        // Arrange Section
+        Semester testSemester = new Semester("ED");
+        short ectsTest = -28;
+        
+        // Act and Assert Section
+        Assert.ThrowsException<ArgumentException>(() => testSemester.ecstTotalProperty = ectsTest);
+    }
+
+    [TestMethod]
+    public void Ects_Set_Too_High()
+    {
+        // Testing protection against providing too high ects number (Over 40)      
+    }
+}
+
+[TestClass]
+public class DatabaseTest
+{
+    // Testing semester class database methods like create, drop table and check if exists
+    // Testing also data insertion and data fetching
+    
+    [TestMethod]
+    public void Testing_Table_Creation()
+    {
+        // Testing CreateTable method from Semester Class 
+        // Method should create table if not exists
+        // Using TestUtils to drop table and check if new is created
+        // We assume that TestUtils works 100% fine.
+        
+        // TODO
+        // Arrange Section
+        
+        // Act Section
+        
+        // Assert Section
+        
     }
 }

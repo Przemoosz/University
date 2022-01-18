@@ -9,12 +9,17 @@ public class Semester: IData
     private short _ectsObtained = 0;
     private float _average = 0.0f;
     private string _title = "ED";
+    private int _fieldIdReference;
 
     public Semester(string title)
     {
         _title = title;
     }
-    
+
+    public Semester(string title, int fieldInt)
+    {
+        _fieldIdReference = fieldInt;
+    }
     public string nameProperty
     { 
         get => _name;
@@ -50,10 +55,47 @@ public class Semester: IData
             else throw new ArgumentException("Title is not provided!");
         } 
     }
-    
-    public void CreateField()
+
+    public short ecstTotalProperty
     {
-        throw new NotImplementedException();
+        get => _ectsTotal;
+        set
+        {
+            if (value > 40) throw new ArgumentException("Total ects for semester should not be greater than 50!");
+            if (value < 0) throw new ArgumentException("Total ects can not be negative number!");
+            _ectsTotal = value;
+        }
+    }
+    public void CreateTable()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string command = @"CREATE TABLE IF NOT EXISTS semester 
+            (id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            ectsTotal SMALLINT NOT NULL,
+            ectsObtained SMALLINT DEFAULT 0,
+            average FLOAT DEFAULT 0,
+            field_id INT REFERENCES fields(id))";
+            using (NpgsqlCommand cmd = new NpgsqlCommand(command,connection))
+            {
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    connection.Close();
+                    Console.WriteLine(ex);
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 
     public void ProvideName()
@@ -61,7 +103,7 @@ public class Semester: IData
         throw new NotImplementedException();
     }
 
-    public void CreateTable()
+    public void CreateField()
     {
         throw new NotImplementedException();
     }
