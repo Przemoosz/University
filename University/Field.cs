@@ -164,8 +164,8 @@ public class Field : IData
         string providedNumber;
         int num;
         string providedTitle; 
-        Console.WriteLine($"Select Title(1 - Engineer Degree, 2 - Master Engineer Degree)");
-        Console.Write("Selected Title (Number): ");
+            Console.WriteLine($"Select Title(1 - Engineer Degree, 2 - Master Engineer Degree)");
+            Console.Write("Selected Title (Number): ");
         providedNumber = Console.ReadLine().Trim();
         while (!Int32.TryParse(providedNumber, out num))
         {

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Npgsql;
 using University;
 namespace SemesterTest;
 
@@ -150,10 +152,10 @@ public class EctsTest
         short ectsTest = 24;
         
         // Act Section
-        testSemester.ecstTotalProperty = ectsTest;
+        testSemester.ectsTotalProperty = ectsTest;
         
         // Assert Section
-        Assert.AreEqual(ectsTest,testSemester.ecstTotalProperty);
+        Assert.AreEqual(ectsTest,testSemester.ectsTotalProperty);
     }
 
     [TestMethod]
@@ -167,7 +169,7 @@ public class EctsTest
         short ectsTest = -28;
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testSemester.ecstTotalProperty = ectsTest);
+        Assert.ThrowsException<ArgumentException>(() => testSemester.ectsTotalProperty = ectsTest);
     }
 
     [TestMethod]
@@ -183,6 +185,18 @@ public class DatabaseTest
     // Testing semester class database methods like create, drop table and check if exists
     // Testing also data insertion and data fetching
     
+    [AssemblyInitialize]
+    public static void AssemblyInit(TestContext context)
+    {
+        // Initialize Test
+        TestUtils.TableDrop();
+        Field testField = new Field();
+        testField.DropTable();
+        testField.CreateTable();
+        testField.DataInsertion();
+        // https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/ms245265(v=vs.120)
+    }
+    
     [TestMethod]
     public void Testing_Table_Creation()
     {
@@ -191,12 +205,140 @@ public class DatabaseTest
         // Using TestUtils to drop table and check if new is created
         // We assume that TestUtils works 100% fine.
         
-        // TODO
         // Arrange Section
-        
+
+        Semester testSemester = new Semester("ED", 1);
+
         // Act Section
+        testSemester.CreateTable();
         
         // Assert Section
+        Assert.AreEqual(true, TestUtils.TableExists());
+    }
+    
+    
+    [TestMethod]
+    public void Testing_Table_Drop()
+    {
+        // Testing DropTable method from Semester class
+        
+        // Arrange Section
+        TestUtils.TableDrop();
+        TestUtils.CreateSimpleTableToDrop();
+        Field testField = new Field();
+        testField.DropTable();
+        testField.CreateTable();
+        testField.DataInsertion();
+        Semester testSemester = new Semester("ED",1);
+        
+        // Act Section
+        testSemester.DropTable();
+        
+        // Assert Section
+        Assert.AreEqual(false,TestUtils.TableExists());
+    }
+
+    [TestMethod]
+    public void Testing_Table_Data_Insertion()
+    {
+        // Testing data insertion method
+        
+        // Arrange Section
+        Semester testSemester = new Semester("ED", 1);
+        string testName = "Semester III";
+        short testEcts = 23;
+        int referenceTestId = 1;
+        
+        int fetchedId;
+        string fetchedName;
+        short fetchedEctsTotal;
+        short fetchedEctsObtained;
+        double fetchedAvereage;
+        int fetchedReferenceId;
+
+        // Act Section
+        testSemester.CreateTable();
+        testSemester.nameProperty = testName;
+        testSemester.ectsTotalProperty = testEcts;
+        testSemester.DataInsertion();
+        
+        // Fetching data from Database
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT * FROM semester;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                var result = command.ExecuteReader();
+                result.Read();
+                fetchedId = result.GetInt32(0);
+                fetchedName = result.GetString(1);
+                fetchedEctsTotal = result.GetInt16(2);
+                fetchedEctsObtained = result.GetInt16(3);
+                fetchedAvereage = result.GetDouble(4);
+                fetchedReferenceId = result.GetInt32(5);
+            }
+            connection.Close();
+        }
+        // Assert Section
+        Assert.AreEqual(1,fetchedId);
+        Assert.AreEqual(testName,fetchedName);
+        Assert.AreEqual(testEcts,fetchedEctsTotal);
+        Assert.AreEqual(0,fetchedEctsObtained);
+        Assert.AreEqual(0,fetchedAvereage);
+        Assert.AreEqual(referenceTestId,fetchedReferenceId);
         
     }
+
+    [TestMethod]
+    public void Testing_Table_Exists()
+    {
+        // Testing TableExists method
+        // Table will exists so method should return True
+        
+        // Arrange Section
+        Semester testSemester = new Semester("ED", 1);
+        testSemester.CreateTable();
+        bool result;
+        
+        // Act Section
+        result = testSemester.TableExists();
+        
+        // Assert Section
+        Assert.AreEqual(true,result);
+
+    }
+
+    [TestMethod]
+    public void Testing_Table_Not_Exists()
+    {
+        // Testing TableExists method
+        // Table won't exists so method should return False
+        
+        // Arrange Section
+        Semester testSemester = new Semester("ED",1);
+        bool result;
+        // Act Section
+        result = testSemester.TableExists();
+        
+        // Assert Section
+        Assert.AreEqual(false,result);
+    }
+    
+    [TestCleanup]
+    public void AfterTestCleanUp()
+    {
+        TestUtils.TableDrop();
+    }
+
+    [AssemblyCleanup]
+    public static void AssemblyCleanup()
+    {
+        // Cleaning after tests
+        Console.WriteLine("Cleanup");
+        Field testField = new Field();
+        testField.DropTable();
+    }
+    
+    
 }
