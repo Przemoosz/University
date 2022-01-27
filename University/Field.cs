@@ -292,5 +292,18 @@ public class Field : IData
             connection.Close();
         }
     }
-    
+
+    public void ShowConnectedSemesters()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT fields.id, fields.name, semester.name, average FROM fields INNER JOIN semester ON fields.id = field_id;";
+        }
+    }
+
+    public void ObtainedEctsRecalculate()
+    {
+        
+    }
 }
