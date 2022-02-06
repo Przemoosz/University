@@ -178,11 +178,11 @@ public class Semester: IData
         ectsTotalProperty = providedEcts;
     }
 
-    public void CreateField()
+    public void CreateSemester()
     {
-        DropTable();
-        CreateTable();
         ProvideName();
+        ProvideEctsTotal();
+        DataInsertion();
     }
 
     public void DropTable()
@@ -259,6 +259,7 @@ public class Semester: IData
                 {
                     Console.WriteLine($"{result.GetInt32(0)} -- {result.GetString(1)} -- {result.GetInt16(2)} -- {result.GetInt16(3)} -- {result.GetDouble(4)} -- {result.GetInt32(5)}");
                 }
+                result.Close();
             }
 
         }        

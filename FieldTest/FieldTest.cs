@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using University;
@@ -279,7 +280,7 @@ public class DatabaseTest
     public void Testing_Table_Creation()
     {
         // Testing CreateTable method 
-        
+
         // Arrange Section
         Field testingField = new Field();
         bool exists;
@@ -307,64 +308,67 @@ public class DatabaseTest
                 connection.Close();
             }
         }
+
         // Assert Section
-        Assert.AreEqual(true,exists);
+        Assert.AreEqual(true, exists);
     }
 
     [TestMethod]
     public void Testing_Table_Drop()
     {
         // Testing DropTable method
-        
+
         // Arrange Section
         TestUtils.TableDrop();
         TestUtils.SimpleTableCreate();
         Field testField = new Field();
         bool result;
-        
+
         // Act Section
         testField.DropTable();
         result = TestUtils.TableExists();
-        
+
         // Assert Section
-        Assert.AreEqual(false,result);
+        Assert.AreEqual(false, result);
     }
+
     [TestMethod]
     public void Testing_Table_Exists()
     {
         // Testing TableExists method
         // Table fields will exist so method should return true
-        
+
         // Arrange Section
         TestUtils.TableDrop();
         TestUtils.SimpleTableCreate();
         Field testField = new Field();
         bool result;
-        
+
         // Act Section
         result = testField.TableExists();
-        
+
         // Assert Section
-        Assert.AreEqual(true,result);
-        
+        Assert.AreEqual(true, result);
+
 
     }
+
     [TestMethod]
     public void Testing_Table_Dont_Exists()
     {
         // Testing TableExist Method
         // Table "fields" won't exist so method should return false
-        
+
         // Arrange Section
         TestUtils.TableDrop();
         Field testField = new Field();
         bool result;
-        
+
         // Act Section
         result = testField.TableExists();
-        
+
         // Assert Section
-        Assert.AreEqual(false,result);
+        Assert.AreEqual(false, result);
     }
 
     [TestMethod]
@@ -372,7 +376,7 @@ public class DatabaseTest
     {
         // Inserting specified data, and testing if DataInsertion method
         // inserted value in correct way.
-        
+
         // Arrange Section
         Field testingField = new Field();
         string testName = "TestName";
@@ -380,16 +384,16 @@ public class DatabaseTest
         short testEctsTotal = 43;
         short testStartingYear = 2021;
         short testEndingYear = 2024;
-                   
+
         int id;
         string NameFetched;
         short EctsTotalFetched;
         short EctsObtainedFetched;
         short StartingYearFetched;
         short EndingYearFetched;
-        string TitleFetched;        
+        string TitleFetched;
         TestUtils.TableDrop();
-        
+
         // Act Section
         testingField.CreateTable();
         testingField.nameProperty = testName;
@@ -398,7 +402,7 @@ public class DatabaseTest
         testingField.yearStartingProperty = testStartingYear;
         testingField.yearEndingProperty = testEndingYear;
         testingField.DataInsertion();
-        
+
         // Fetching data from DB
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
         {
@@ -409,24 +413,173 @@ public class DatabaseTest
                 var resultObject = cmd.ExecuteReader();
                 resultObject.Read();
                 id = resultObject.GetInt32(0);
-                NameFetched = resultObject.GetString(1);         
-                EctsTotalFetched = resultObject.GetInt16(2);     
-                EctsObtainedFetched = resultObject.GetInt16(3);  
-                StartingYearFetched = resultObject.GetInt16(4);  
-                EndingYearFetched = resultObject.GetInt16(5);    
-                TitleFetched = resultObject.GetString(6);          
-                
+                NameFetched = resultObject.GetString(1);
+                EctsTotalFetched = resultObject.GetInt16(2);
+                EctsObtainedFetched = resultObject.GetInt16(3);
+                StartingYearFetched = resultObject.GetInt16(4);
+                EndingYearFetched = resultObject.GetInt16(5);
+                TitleFetched = resultObject.GetString(6);
+                resultObject.Close();
             }
+
             connection.Close();
         }
+
         // Assert Section
-        Assert.AreEqual(1,id);
-        Assert.AreEqual(testName,NameFetched);
-        Assert.AreEqual(testEctsTotal,EctsTotalFetched);
-        Assert.AreEqual(0,EctsObtainedFetched); 
-        Assert.AreEqual(testStartingYear,StartingYearFetched); 
-        Assert.AreEqual(testEndingYear,EndingYearFetched); 
-        Assert.AreEqual(testTitle,TitleFetched); 
+        Assert.AreEqual(1, id);
+        Assert.AreEqual(testName, NameFetched);
+        Assert.AreEqual(testEctsTotal, EctsTotalFetched);
+        Assert.AreEqual(0, EctsObtainedFetched);
+        Assert.AreEqual(testStartingYear, StartingYearFetched);
+        Assert.AreEqual(testEndingYear, EndingYearFetched);
+        Assert.AreEqual(testTitle, TitleFetched);
         TestUtils.TableDrop();
+    }
+
+    [TestMethod]
+    public void Testing_Load_Data_From_Database()
+    {
+        // Testing load data method from field class
+        // Method should load all information about field from DB
+
+        // Arrange Section
+        Field testField = new Field();
+        testField.titleProperty = "Engineer Degree";
+        testField.DropTable();
+        testField.CreateTable();
+        testField.DataInsertion();
+        Field testResultField = new Field();
+
+        using (var sr = new StringReader("1"))
+        {
+
+            Console.SetIn(sr);
+
+            // Act Section
+            testResultField.LoadFieldFromDatabase();
+            
+            // Assert Section
+            Assert.AreEqual(1,testResultField.fieldIdProperty);
+            Assert.AreEqual("None",testResultField.nameProperty);
+            Assert.AreEqual(0,testResultField.ectsObtainedProperty);
+            Assert.AreEqual(0,testResultField.ectsTotalProperty);
+            Assert.AreEqual(Convert.ToInt16(DateTime.Now.Year),testResultField.yearStartingProperty);
+            Assert.AreEqual(Convert.ToInt16(DateTime.Now.Year+3),testResultField.yearEndingProperty);
+            Assert.AreEqual("Engineer Degree",testResultField.titleProperty);
+        }
+        
+    }
+}
+
+[TestClass]
+public class ProvidingMethodsTests
+{
+    // Testing all provide methods from fields class
+    // Setting too long/blank/too short variables is not possible due to 
+    // protection inside Property Setters
+    
+    [TestMethod]
+    public void Name_Providing_Test()
+    {
+        // Testing name providing method
+        // Method should save provided name in name variable
+        
+        // Arrange Section
+        Field testField = new Field();
+        string name = "TestName";
+        
+        // Act Section
+        using (var sr = new StringReader(name))
+        {
+            Console.SetIn(sr);
+            testField.ProvideName();
+        }
+        
+        // Assert Section
+        Assert.AreEqual(name,testField.nameProperty);
+    }
+
+    [TestMethod]
+    public void Ects_Total_Providing_Test()
+    {
+        // Testing Ects providing method
+        // Method should save provided ects total number in ects total variable
+        
+        // Assert Section
+        Field testField = new Field();
+        string ects = "20";
+        
+        // Act Section
+        using (var sr = new StringReader(ects))
+        {
+            Console.SetIn(sr);
+            testField.ProvideEcstTotal();
+        }
+        // Assert Section
+        Assert.AreEqual(Int16.Parse(ects),testField.ectsTotalProperty);
+    }
+
+    [TestMethod]
+    public void Year_Starting_Providing_Test()
+    {
+        // Testing Starting Year providing method
+        // Method should save provided starting year in starting year variable
+        
+        // Arrange Section
+        Field testField = new Field();
+        string startingYear = "2020";
+        
+        // Act Section
+        using (var sr = new StringReader(startingYear))
+        {
+            Console.SetIn(sr);
+            testField.ProvideStartingYear();
+        }
+        
+        // Assert Section
+        Assert.AreEqual(Int16.Parse(startingYear),testField.yearStartingProperty);
+    }
+    
+    [TestMethod]
+    public void Year_Ending_Providing_Test()
+    {
+        // Testing Starting Year providing method
+        // Method should save provided ending year in ending year variable
+        
+        // Arrange Section
+        Field testField = new Field();
+        testField.yearStartingProperty = 2020;
+        string endingYear = "2023";
+        
+        // Act Section
+        using (var sr = new StringReader(endingYear))
+        {
+            Console.SetIn(sr);
+            testField.ProvideStartingYear();
+        }
+        
+        // Assert Section
+        Assert.AreEqual(Int16.Parse(endingYear),testField.yearStartingProperty);
+    }
+
+    [TestMethod]
+    public void Title_Providing_Method()
+    {
+        // Testing Title providing method
+        // Method should save provided title in correct form in title variable
+        
+        // Arrange Section
+        Field testField = new Field();
+        string choosedNumber = "1";
+        
+        // Act Section
+        using (var sr = new StringReader(choosedNumber))
+        {
+            Console.SetIn(sr);
+            testField.ProvideTitle();
+        }
+        
+        // Assert Section
+        Assert.AreEqual("Engineer Degree", testField.titleProperty);
     }
 }

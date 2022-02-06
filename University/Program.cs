@@ -9,8 +9,23 @@ namespace University
             bool[] t = new bool[2] {false, false};
             bool[] s = new bool[2] {false, false};
             Field newField = new Field();
-            newField.CreateTable();
-            newField.DataInsertion();
+            newField.CreateField();
+            //newField.LoadFieldFromDatabase();
+            //Console.WriteLine(newField.nameProperty);
+            // newField.ObtainedEctsRecalculate();
+            // newField.DropTable();
+            // newField.CreateTable();
+            // newField.CreateField();
+            // Semester newSemester = new Semester("ED", 1);
+            // newSemester.DropTable();
+            // newSemester.CreateTable();
+            // newSemester.CreateSemester();
+            // newSemester.CreateSemester();
+            // newField.ShowConnectedSemesters();
+            // Field.AllFieldsInDatabase();
+            //newField.ShowConnectedSemesters();
+            //newField.CreateTable();
+            //newField.DataInsertion();
             // newField.DropTable();
             // newField.CreateTable();
             // Random rndInt = new Random();
@@ -22,12 +37,12 @@ namespace University
             //
             // newField.DataInsertion();
             // Console.WriteLine(newField.fieldIdProperty);
-            Semester sem = new Semester("MED",1);
-            
-            sem.DropTable();
-            sem.CreateTable();
-            sem.DataInsertion();
-            sem.FetchDataFromDb();
+            // Semester sem = new Semester("MED",1);
+
+            // sem.DropTable();
+            // sem.CreateTable();
+            // sem.DataInsertion();
+            // sem.FetchDataFromDb();
             //sem.ProvideName();
             //Console.WriteLine(sem.nameProperty);
             //sem.CreateTable();

@@ -277,6 +277,7 @@ public class DatabaseTest
                 fetchedEctsObtained = result.GetInt16(3);
                 fetchedAvereage = result.GetDouble(4);
                 fetchedReferenceId = result.GetInt32(5);
+                result.Close();
             }
             connection.Close();
         }

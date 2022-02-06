@@ -15,7 +15,8 @@ public class Field : IData
     private short yearStarting = Convert.ToInt16(DateTime.Now.Year);
     private short yearEnding = Convert.ToInt16(DateTime.Now.Year+3);
     private string title = "None";
-    private int _fieldId;
+    // Default seted to one
+    private int _fieldId = 1;
 
     public string nameProperty
     {
@@ -45,6 +46,7 @@ public class Field : IData
         {
             // ECTS Obtained is sum from ECTS semesters
             // WIP
+            ectsTotal = value;
         }
     }
 
@@ -85,6 +87,7 @@ public class Field : IData
 
     public int fieldIdProperty
     {
+        set => _fieldId = value;
         get => _fieldId;
     }
     public Field()
@@ -111,7 +114,7 @@ public class Field : IData
         nameProperty = providedName;
     }
 
-    private void ProvideEcstTotal()
+    public void ProvideEcstTotal()
     {
         string providedEctsString;
         short providedEcts; 
@@ -127,7 +130,7 @@ public class Field : IData
         ectsTotalProperty = providedEcts;
     }
 
-    private void ProvideStartingYear()
+    public void ProvideStartingYear()
     {
         string providedStartingYearString;
         short providedStartingYear; 
@@ -143,7 +146,7 @@ public class Field : IData
         yearStartingProperty = providedStartingYear;
     }
 
-    private void ProvideEndingYear()
+    public void ProvideEndingYear()
     {
         string providedEndingYearString;
         short providedEndingYear; 
@@ -159,7 +162,7 @@ public class Field : IData
         yearEndingProperty = providedEndingYear;
     }
 
-    private void ProvideTitle()
+    public void ProvideTitle()
     {
         string providedNumber;
         int num;
@@ -298,12 +301,126 @@ public class Field : IData
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
         {
             connection.Open();
-            string cmd = "SELECT fields.id, fields.name, semester.name, average FROM fields INNER JOIN semester ON fields.id = field_id;";
+            string cmd = "SELECT fields.id, fields.name, semester.name AS semname,semester.ectstotal, semester.ectsobtained, average FROM fields INNER JOIN semester ON fields.id = field_id;";
+            using (NpgsqlCommand commmand = new NpgsqlCommand(cmd,connection))
+            {
+                NpgsqlDataReader reader = commmand.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    Console.WriteLine("ID -- FieldName -- SemName -- EctsTotal -- EctsObtained -- Average");
+                    while (reader.Read())
+                    {
+                        Console.WriteLine($"{reader.GetInt32(0)} -- {reader.GetString(1)} -- {reader.GetString(2)} -- {reader.GetInt16(3)} -- " +
+                                          $"{reader.GetInt16(4)} -- {reader.GetDouble(5)}");
+                    }
+                }
+                else
+                {
+                    //TODO
+                }
+            }
+            connection.Close();
         }
     }
 
     public void ObtainedEctsRecalculate()
     {
-        
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            short newEctsTotal = 0;
+            short newEctsObtained = 0;
+            connection.Open();
+            // Console.WriteLine(_fieldId);
+            string cmd = $"SELECT fields.id, semester.ectsobtained,semester.ectstotal FROM fields INNER JOIN semester ON semester.field_id = {this._fieldId};";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                NpgsqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    // Console.WriteLine("Name -- EctsObtained -- EctsTotal -- Average");
+                    while (reader.Read())
+                    {
+                        newEctsObtained += reader.GetInt16(1);
+                        newEctsTotal += reader.GetInt16(2);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No rows Available");
+                }
+                reader.Close();
+            }
+
+            cmd = $"UPDATE fields SET ectsobtained = {newEctsObtained}, ectstotal = {newEctsTotal} WHERE id = {this._fieldId}";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                Console.WriteLine(newEctsTotal);
+                command.ExecuteNonQuery();
+            }
+
+            ectsObtained = newEctsObtained;
+            ectsTotal = newEctsTotal;
+                connection.Close();
+        }
+    }
+
+    public void LoadFieldFromDatabase()
+    {
+        int chosedNumber;
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        {
+            string cmd = "SELECT id,name from fields;";
+            connection.Open();
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                
+                NpgsqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    Console.WriteLine("Available fields to load: ");
+                    while (reader.Read())
+                    {
+                        Console.WriteLine($"{reader.GetInt32(0)} -- {reader.GetString(1)}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("There is no rows available!");
+                }
+                reader.Close();
+            }
+            Console.WriteLine("Choose field (type number): ");
+            chosedNumber = Int32.Parse(Console.ReadLine());
+            Console.WriteLine(chosedNumber);
+            cmd = $"SELECT * FROM fields WHERE id = {chosedNumber};";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                try
+                {
+                    NpgsqlDataReader reader = command.ExecuteReader();
+                    {
+                        if (reader.HasRows)
+                        {
+                            reader.Read();
+                            fieldIdProperty = reader.GetInt32(0);
+                            nameProperty = reader.GetString(1);
+                            ectsTotalProperty = reader.GetInt16(2);
+                            ectsObtainedProperty = reader.GetInt16(3);
+                            yearStartingProperty = reader.GetInt16(4);
+                            yearEndingProperty = reader.GetInt16(5);
+                            titleProperty = reader.GetString(6);
+                        }
+                        reader.Close();
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+
+            }
+            connection.Close();
+        }
     }
 }
