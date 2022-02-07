@@ -6,12 +6,18 @@ namespace University
     {
         public static void Main(string[] args)
         {
-            bool[] t = new bool[2] {false, false};
-            bool[] s = new bool[2] {false, false};
-            Field newField = new Field();
-            newField.CreateField();
-            //newField.LoadFieldFromDatabase();
-            //Console.WriteLine(newField.nameProperty);
+            // bool[] t = new bool[2] {false, false};
+            // bool[] s = new bool[2] {false, false};
+            Subject s = new Subject();
+            s.examGradeProperty = 2.0f;
+            s.exceriseGradeProperty = 4.5f;
+            s.laboratoryGradeProperty = 2.5f;
+            s.AverageCalculate();
+            Console.WriteLine(s.averageProperty);
+            // Field newField = new Field();
+            // newField.CreateField();
+            // newField.LoadFieldFromDatabase();
+            // Console.WriteLine(newField.nameProperty);
             // newField.ObtainedEctsRecalculate();
             // newField.DropTable();
             // newField.CreateTable();
