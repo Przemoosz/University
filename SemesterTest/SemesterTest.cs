@@ -25,10 +25,10 @@ public class NameTesting
         foreach (string test in testingSemesterNames)
         {
             // Inner Act section
-            testSemester.nameProperty = test;
+            testSemester.NameProperty = test;
             
             // Inner Assert Section
-            Assert.AreEqual(test,testSemester.nameProperty);
+            Assert.AreEqual(test,testSemester.NameProperty);
         }
     }
 
@@ -45,10 +45,10 @@ public class NameTesting
         
         // Act Section
         string testingName = testingSemesterNames[rndIndex];
-        testSemester.nameProperty = testingName;
+        testSemester.NameProperty = testingName;
         
         // Assert Section
-        Assert.AreEqual(testingName,testSemester.nameProperty);
+        Assert.AreEqual(testingName,testSemester.NameProperty);
 
     }
     [TestMethod]
@@ -63,7 +63,7 @@ public class NameTesting
         string testName = "WRONG SEMESTER";
         
         // Act and Assert section
-        Assert.ThrowsException<ArgumentException>(() => testSemester.nameProperty = testName);
+        Assert.ThrowsException<ArgumentException>(() => testSemester.NameProperty = testName);
     }
 
     [TestMethod]
@@ -80,10 +80,10 @@ public class NameTesting
         // Act Section
         rndIndex = rndIndexGenerator.Next(0, 2);
         string generatedName = testingSemesterNames[rndIndex];
-        testSemester.nameProperty = generatedName;
+        testSemester.NameProperty = generatedName;
         
         // Assert Section
-        Assert.AreEqual(generatedName,testSemester.nameProperty);
+        Assert.AreEqual(generatedName,testSemester.NameProperty);
     }
 
     [TestMethod]
@@ -100,10 +100,10 @@ public class NameTesting
         foreach (string name in testingSemesterNames)
         {
             // Inner Act Section
-            testSemester.nameProperty = name;
+            testSemester.NameProperty = name;
             
             // Inner Assert Section
-            Assert.AreEqual(name,testSemester.nameProperty);
+            Assert.AreEqual(name,testSemester.NameProperty);
         }
     }
 
@@ -119,7 +119,7 @@ public class NameTesting
         string wrongName = "WRONG NAME";
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testSemester.nameProperty = wrongName);
+        Assert.ThrowsException<ArgumentException>(() => testSemester.NameProperty = wrongName);
     }
 
     [TestMethod]
@@ -133,7 +133,7 @@ public class NameTesting
         string name = "Semestr I";
         
         // Act and Arrange Section 
-        Assert.ThrowsException<ArgumentException>(() => testSemester.nameProperty = name);
+        Assert.ThrowsException<ArgumentException>(() => testSemester.NameProperty = name);
     }
 }
 
@@ -152,10 +152,10 @@ public class EctsTest
         short ectsTest = 24;
         
         // Act Section
-        testSemester.ectsTotalProperty = ectsTest;
+        testSemester.EctsTotalProperty = ectsTest;
         
         // Assert Section
-        Assert.AreEqual(ectsTest,testSemester.ectsTotalProperty);
+        Assert.AreEqual(ectsTest,testSemester.EctsTotalProperty);
     }
 
     [TestMethod]
@@ -169,7 +169,7 @@ public class EctsTest
         short ectsTest = -28;
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testSemester.ectsTotalProperty = ectsTest);
+        Assert.ThrowsException<ArgumentException>(() => testSemester.EctsTotalProperty = ectsTest);
     }
 
     [TestMethod]
@@ -258,12 +258,12 @@ public class DatabaseTest
 
         // Act Section
         testSemester.CreateTable();
-        testSemester.nameProperty = testName;
-        testSemester.ectsTotalProperty = testEcts;
+        testSemester.NameProperty = testName;
+        testSemester.EctsTotalProperty = testEcts;
         testSemester.DataInsertion();
         
         // Fetching data from Database
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "SELECT * FROM semester;";

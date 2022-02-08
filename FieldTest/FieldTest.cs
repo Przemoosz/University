@@ -22,10 +22,10 @@ public class NameTest
         string nameToSet = "TestField";
         
         // Act section
-        testField.nameProperty = nameToSet;
+        testField.NameProperty = nameToSet;
         
         // Assert Section
-        Assert.AreEqual(nameToSet,testField.nameProperty);
+        Assert.AreEqual(nameToSet,testField.NameProperty);
     }
 
     [TestMethod]
@@ -40,7 +40,7 @@ public class NameTest
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ullamcorper nisl justo, at efficitur nibh egestas eu. Donec dignissim et turpis sed tempus. Duis dapibus eleifend ullamcorper. Nulla lacus arcu, placerat eget molestie et, auctor ut lectus. Duis in tincidunt ex.";
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.nameProperty = nameToSet);
+        Assert.ThrowsException<ArgumentException>(() => testField.NameProperty = nameToSet);
     }
 
     [TestMethod]
@@ -54,7 +54,7 @@ public class NameTest
         string testName = "";
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.nameProperty = testName);
+        Assert.ThrowsException<ArgumentException>(() => testField.NameProperty = testName);
     }
     
 }
@@ -78,10 +78,10 @@ public class EctsTests
         Field testField = new Field();
         
         // Act Section
-        testField.ectsTotalProperty = ectsTest;
+        testField.EctsTotalProperty = ectsTest;
         
         // Assert Section
-        Assert.AreEqual(ectsTest, testField.ectsTotalProperty);
+        Assert.AreEqual(ectsTest, testField.EctsTotalProperty);
     }
 
     [TestMethod]
@@ -95,7 +95,7 @@ public class EctsTests
         Field testField = new Field();
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.ectsTotalProperty = ectsTest);
+        Assert.ThrowsException<ArgumentException>(() => testField.EctsTotalProperty = ectsTest);
     }
 
     [TestMethod]
@@ -109,7 +109,7 @@ public class EctsTests
         Field testField = new Field();
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.ectsTotalProperty = ectstest);
+        Assert.ThrowsException<ArgumentException>(() => testField.EctsTotalProperty = ectstest);
     }
 }
 
@@ -131,10 +131,10 @@ public class YearTest
         Field testField = new Field();
         
         // Act Section
-        testField.yearStartingProperty = yearTest;
+        testField.YearStartingProperty = yearTest;
         
         // Assert Section 
-        Assert.AreEqual(yearTest,testField.yearStartingProperty);
+        Assert.AreEqual(yearTest,testField.YearStartingProperty);
     }
 
     [TestMethod]
@@ -148,7 +148,7 @@ public class YearTest
         Field testField = new Field();
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.yearStartingProperty = minYear);
+        Assert.ThrowsException<ArgumentException>(() => testField.YearStartingProperty = minYear);
     }
 
     [TestMethod]
@@ -162,7 +162,7 @@ public class YearTest
         Field testField = new Field();
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.yearStartingProperty = maxYear);
+        Assert.ThrowsException<ArgumentException>(() => testField.YearStartingProperty = maxYear);
     }
 
     [TestMethod]
@@ -173,13 +173,13 @@ public class YearTest
         // Arrange Section
         short testEndingYear = 2025;
         Field testField = new Field();
-        testField.yearStartingProperty = 2021;
+        testField.YearStartingProperty = 2021;
         
         // Act Section
-        testField.yearEndingProperty = testEndingYear;
+        testField.YearEndingProperty = testEndingYear;
         
         // Assert Section
-        Assert.AreEqual(testEndingYear,testField.yearEndingProperty);
+        Assert.AreEqual(testEndingYear,testField.YearEndingProperty);
     }
 
     [TestMethod]
@@ -192,10 +192,10 @@ public class YearTest
         short testStartingYear = 2021;
         short testingEndingYear = 1970;
         Field testField = new Field();
-        testField.yearStartingProperty = testStartingYear;
+        testField.YearStartingProperty = testStartingYear;
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.yearEndingProperty = testingEndingYear);
+        Assert.ThrowsException<ArgumentException>(() => testField.YearEndingProperty = testingEndingYear);
     }
 
     [TestMethod]
@@ -208,10 +208,10 @@ public class YearTest
         short testStartingYear = 2021;
         short testEndingYear = 2029;
         Field testField = new Field();
-        testField.yearStartingProperty = testStartingYear;
+        testField.YearStartingProperty = testStartingYear;
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testField.yearEndingProperty = testEndingYear);
+        Assert.ThrowsException<ArgumentException>(() => testField.YearEndingProperty = testEndingYear);
     }
 }
 
@@ -231,10 +231,10 @@ public class TitleTests
         string testTitle = "Engineer Degree";
         
         // Act Section
-        testField.titleProperty = testTitle;
+        testField.TitleProperty = testTitle;
         
         // Assert Section
-        Assert.AreEqual(testTitle,testField.titleProperty);
+        Assert.AreEqual(testTitle,testField.TitleProperty);
         
     }
     [TestMethod]
@@ -247,10 +247,10 @@ public class TitleTests
         string testTitle = "Master Engineer Degree";
         
         // Act Section
-        testField.titleProperty = testTitle;
+        testField.TitleProperty = testTitle;
         
         // Assert Section
-        Assert.AreEqual(testTitle,testField.titleProperty);
+        Assert.AreEqual(testTitle,testField.TitleProperty);
     }
 
     [TestMethod]
@@ -264,7 +264,7 @@ public class TitleTests
         Field testField = new Field();
         
         // Act and Asser Section
-        Assert.ThrowsException<ArgumentException>(() => testField.titleProperty = testTitle);
+        Assert.ThrowsException<ArgumentException>(() => testField.TitleProperty = testTitle);
     }
 }
 
@@ -386,25 +386,25 @@ public class DatabaseTest
         short testEndingYear = 2024;
 
         int id;
-        string NameFetched;
-        short EctsTotalFetched;
-        short EctsObtainedFetched;
-        short StartingYearFetched;
-        short EndingYearFetched;
-        string TitleFetched;
+        string nameFetched;
+        short ectsTotalFetched;
+        short ectsObtainedFetched;
+        short startingYearFetched;
+        short endingYearFetched;
+        string titleFetched;
         TestUtils.TableDrop();
 
         // Act Section
         testingField.CreateTable();
-        testingField.nameProperty = testName;
-        testingField.titleProperty = testTitle;
-        testingField.ectsTotalProperty = testEctsTotal;
-        testingField.yearStartingProperty = testStartingYear;
-        testingField.yearEndingProperty = testEndingYear;
+        testingField.NameProperty = testName;
+        testingField.TitleProperty = testTitle;
+        testingField.EctsTotalProperty = testEctsTotal;
+        testingField.YearStartingProperty = testStartingYear;
+        testingField.YearEndingProperty = testEndingYear;
         testingField.DataInsertion();
 
         // Fetching data from DB
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = "SELECT * FROM fields;";
@@ -413,12 +413,12 @@ public class DatabaseTest
                 var resultObject = cmd.ExecuteReader();
                 resultObject.Read();
                 id = resultObject.GetInt32(0);
-                NameFetched = resultObject.GetString(1);
-                EctsTotalFetched = resultObject.GetInt16(2);
-                EctsObtainedFetched = resultObject.GetInt16(3);
-                StartingYearFetched = resultObject.GetInt16(4);
-                EndingYearFetched = resultObject.GetInt16(5);
-                TitleFetched = resultObject.GetString(6);
+                nameFetched = resultObject.GetString(1);
+                ectsTotalFetched = resultObject.GetInt16(2);
+                ectsObtainedFetched = resultObject.GetInt16(3);
+                startingYearFetched = resultObject.GetInt16(4);
+                endingYearFetched = resultObject.GetInt16(5);
+                titleFetched = resultObject.GetString(6);
                 resultObject.Close();
             }
 
@@ -427,12 +427,12 @@ public class DatabaseTest
 
         // Assert Section
         Assert.AreEqual(1, id);
-        Assert.AreEqual(testName, NameFetched);
-        Assert.AreEqual(testEctsTotal, EctsTotalFetched);
-        Assert.AreEqual(0, EctsObtainedFetched);
-        Assert.AreEqual(testStartingYear, StartingYearFetched);
-        Assert.AreEqual(testEndingYear, EndingYearFetched);
-        Assert.AreEqual(testTitle, TitleFetched);
+        Assert.AreEqual(testName, nameFetched);
+        Assert.AreEqual(testEctsTotal, ectsTotalFetched);
+        Assert.AreEqual(0, ectsObtainedFetched);
+        Assert.AreEqual(testStartingYear, startingYearFetched);
+        Assert.AreEqual(testEndingYear, endingYearFetched);
+        Assert.AreEqual(testTitle, titleFetched);
         TestUtils.TableDrop();
     }
 
@@ -444,7 +444,7 @@ public class DatabaseTest
 
         // Arrange Section
         Field testField = new Field();
-        testField.titleProperty = "Engineer Degree";
+        testField.TitleProperty = "Engineer Degree";
         testField.DropTable();
         testField.CreateTable();
         testField.DataInsertion();
@@ -459,13 +459,13 @@ public class DatabaseTest
             testResultField.LoadFieldFromDatabase();
             
             // Assert Section
-            Assert.AreEqual(1,testResultField.fieldIdProperty);
-            Assert.AreEqual("None",testResultField.nameProperty);
-            Assert.AreEqual(0,testResultField.ectsObtainedProperty);
-            Assert.AreEqual(0,testResultField.ectsTotalProperty);
-            Assert.AreEqual(Convert.ToInt16(DateTime.Now.Year),testResultField.yearStartingProperty);
-            Assert.AreEqual(Convert.ToInt16(DateTime.Now.Year+3),testResultField.yearEndingProperty);
-            Assert.AreEqual("Engineer Degree",testResultField.titleProperty);
+            Assert.AreEqual(1,testResultField.FieldIdProperty);
+            Assert.AreEqual("None",testResultField.NameProperty);
+            Assert.AreEqual(0,testResultField.EctsObtainedProperty);
+            Assert.AreEqual(0,testResultField.EctsTotalProperty);
+            Assert.AreEqual(Convert.ToInt16(DateTime.Now.Year),testResultField.YearStartingProperty);
+            Assert.AreEqual(Convert.ToInt16(DateTime.Now.Year+3),testResultField.YearEndingProperty);
+            Assert.AreEqual("Engineer Degree",testResultField.TitleProperty);
         }
         
     }
@@ -496,7 +496,7 @@ public class ProvidingMethodsTests
         }
         
         // Assert Section
-        Assert.AreEqual(name,testField.nameProperty);
+        Assert.AreEqual(name,testField.NameProperty);
     }
 
     [TestMethod]
@@ -516,7 +516,7 @@ public class ProvidingMethodsTests
             testField.ProvideEcstTotal();
         }
         // Assert Section
-        Assert.AreEqual(Int16.Parse(ects),testField.ectsTotalProperty);
+        Assert.AreEqual(Int16.Parse(ects),testField.EctsTotalProperty);
     }
 
     [TestMethod]
@@ -537,7 +537,7 @@ public class ProvidingMethodsTests
         }
         
         // Assert Section
-        Assert.AreEqual(Int16.Parse(startingYear),testField.yearStartingProperty);
+        Assert.AreEqual(Int16.Parse(startingYear),testField.YearStartingProperty);
     }
     
     [TestMethod]
@@ -548,7 +548,7 @@ public class ProvidingMethodsTests
         
         // Arrange Section
         Field testField = new Field();
-        testField.yearStartingProperty = 2020;
+        testField.YearStartingProperty = 2020;
         string endingYear = "2023";
         
         // Act Section
@@ -559,7 +559,7 @@ public class ProvidingMethodsTests
         }
         
         // Assert Section
-        Assert.AreEqual(Int16.Parse(endingYear),testField.yearStartingProperty);
+        Assert.AreEqual(Int16.Parse(endingYear),testField.YearStartingProperty);
     }
 
     [TestMethod]
@@ -580,6 +580,6 @@ public class ProvidingMethodsTests
         }
         
         // Assert Section
-        Assert.AreEqual("Engineer Degree", testField.titleProperty);
+        Assert.AreEqual("Engineer Degree", testField.TitleProperty);
     }
 }

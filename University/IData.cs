@@ -2,7 +2,7 @@
 
 public interface IData
 {
-    string nameProperty { get; set; }
+    string NameProperty { get; set; }
     // void CreateField();
     void ProvideName();
     void CreateTable();

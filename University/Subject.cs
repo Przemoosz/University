@@ -1,16 +1,21 @@
-﻿namespace University;
+﻿using Npgsql;
+using NpgsqlTypes;
+
+namespace University;
 
 public class Subject : IData
 {
-    private string _name;
-    private short _ects;
-    private float _average;
+    private string _name = "3dsadasd";
+    private short _ects = 32;
+    private float _average =0.0f;
     private float _endingGrade = 0.0f;
     private float _examGrade = 0.0f;
     private float _laboratoryGrade = 0.0f;
-    private float _excerciseGrade = 0.0f;
+    private float _exerciseGrade = 0.0f;
+    private int _subjectId;
+    private int _semester_id = 1;
 
-    public string nameProperty
+    public string NameProperty
     {
         get { return _name; }
         set
@@ -31,20 +36,123 @@ public class Subject : IData
 
     public void CreateTable()
     {
-        throw new NotImplementedException();
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = @"CREATE TABLE IF NOT EXISTS subjects (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            ects SMALLINT DEFAULT 0,
+            average FLOAT DEFAULT 0,
+            ending_grade FLOAT DEFAULT 0,
+            exam_grade FLOAT DEFAULT 0,
+            labolatory_grade FLOAT DEFAULT 0,
+            exercise_grade FLOAT DEFAULT 0,
+            semester_reference_id INT REFERENCES semester(id));";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    
+                    Console.WriteLine(e);
+                    throw;
+                }
+                finally
+                {
+                 connection.Close();   
+                }
+            }
+        }
     }
 
     public void DropTable()
     {
-        throw new NotImplementedException();
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "DROP TABLE IF EXISTS subjects CASCADE;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
     }
 
     public bool TableExists()
     {
-        throw new NotImplementedException();
+        bool exists;
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='subjects')";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+                exists = Convert.ToBoolean(command.ExecuteScalar().ToString());
+            connection.Close();
+        }
+        Console.WriteLine(exists);
+        return exists;
     }
 
-    public short ectsProperty
+    public void DataInsertion()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "INSERT INTO subjects VALUES (DEFAULT, @NAME, @ECTS, @AVERAGE, @END, @EXAM, @LAB, @EXE, @REFERENCEID) RETURNING id;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                command.Parameters.Add("@NAME", NpgsqlDbType.Varchar);
+                command.Parameters.Add("@ECTS", NpgsqlDbType.Smallint);
+                command.Parameters.Add("@AVERAGE", NpgsqlDbType.Double);
+                command.Parameters.Add("@END", NpgsqlDbType.Double);
+                command.Parameters.Add("@EXAM", NpgsqlDbType.Double);
+                command.Parameters.Add("@LAB", NpgsqlDbType.Double);
+                command.Parameters.Add("@EXE", NpgsqlDbType.Double);
+                command.Parameters.Add("@REFERENCEID", NpgsqlDbType.Integer);
+                command.Parameters["@NAME"].Value = NameProperty;
+                command.Parameters["@ECTS"].Value =EctsProperty;
+                command.Parameters["@AVERAGE"].Value = (double) AverageProperty;
+                command.Parameters["@END"].Value = (double) EndingGradeProperty;
+                command.Parameters["@EXAM"].Value = (double) ExamGradeProperty;
+                command.Parameters["@LAB"].Value = (double) LaboratoryGradeProperty;
+                command.Parameters["@EXE"].Value = (double) ExceriseGradeProperty;
+                command.Parameters["@REFERENCEID"].Value = _semester_id;
+                try
+                {
+                    var reader = command.ExecuteScalar();
+                    _subjectId = Convert.ToInt32(reader);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+
+        }
+    }
+
+    public short EctsProperty
     {
         get => _ects;
         set
@@ -58,32 +166,31 @@ public class Subject : IData
         }
     }
 
-    public float averageProperty
+    public float AverageProperty
     {
-        //TODO
         get => _average;
-        
+        set => _average = value;
     }
 
-    public float endingGradeProperty
+    public float EndingGradeProperty
     {
         get => _endingGrade;
         set => _endingGrade = GradeSetLogic(value);
     }
 
-    public float laboratoryGradeProperty
+    public float LaboratoryGradeProperty
     {
         get => _laboratoryGrade;
         set => _laboratoryGrade = GradeSetLogic(value);
 
     }
-    public float exceriseGradeProperty
+    public float ExceriseGradeProperty
     {
-        get => _excerciseGrade;
-        set => _excerciseGrade = GradeSetLogic(value);
+        get => _exerciseGrade;
+        set => _exerciseGrade = GradeSetLogic(value);
 
     }
-    public float examGradeProperty
+    public float ExamGradeProperty
     {
         get => _examGrade;
         set => _examGrade = GradeSetLogic(value);
@@ -126,16 +233,16 @@ public class Subject : IData
             n++;
         }
 
-        if (notZero(_excerciseGrade))
+        if (notZero(_exerciseGrade))
         {
-            sum += _excerciseGrade;
+            sum += _exerciseGrade;
             n++;
         }
         Console.WriteLine(sum);
         if (n != 0)
         {
-            _average =(float) Math.Round((sum / n),3);
+            AverageProperty =(float) Math.Round((sum / n),3);
         }
-        else _average = 0.0f;
+        else AverageProperty = 0.0f;
     }
 }

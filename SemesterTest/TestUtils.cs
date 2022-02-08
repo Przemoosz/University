@@ -8,7 +8,7 @@ public class TestUtils
 {
     public static void TableDrop()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = "DROP TABLE IF EXISTS semester CASCADE;";
@@ -21,7 +21,7 @@ public class TestUtils
     public static bool TableExists()
     {
         bool exists;
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'semester')";
@@ -37,7 +37,7 @@ public class TestUtils
     {
         // This table should never be in use!
         // Only for testing purpose
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = "CREATE TABLE IF NOT EXISTS semester (id SERIAL PRIMARY KEY)";

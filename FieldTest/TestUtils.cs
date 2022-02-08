@@ -7,7 +7,7 @@ public static class TestUtils
 {
     public static void TableDrop()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = "DROP TABLE IF EXISTS fields CASCADE;";
@@ -21,7 +21,7 @@ public static class TestUtils
 
     public static void SimpleTableCreate()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = "CREATE TABLE IF NOT EXISTS fields(id SERIAL PRIMARY KEY);";
@@ -36,7 +36,7 @@ public static class TestUtils
     public static bool TableExists()
     {
         bool result = false;
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command =

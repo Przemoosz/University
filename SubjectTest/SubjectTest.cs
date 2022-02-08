@@ -19,10 +19,10 @@ public class NamePropertyTests
         string name = "Teoria Obwodów I";
         
         // Act Section
-        testSubject.nameProperty = name;
+        testSubject.NameProperty = name;
         
         // Assert Section
-        Assert.AreEqual(name,testSubject.nameProperty);
+        Assert.AreEqual(name,testSubject.NameProperty);
     }
     [TestMethod]
     public void Name_Provided_Blank()
@@ -35,7 +35,7 @@ public class NamePropertyTests
         string name = "";
         
         // Act and Assert SectionSection
-        Assert.ThrowsException<ArgumentException>(() => testSubject.nameProperty = name);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.NameProperty = name);
     }
     
     [TestMethod]
@@ -49,7 +49,7 @@ public class NamePropertyTests
         string name = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam fringilla quam ac ipsum orci aliquam. Bye!";
         
         // Act and Assert SectionSection
-        Assert.ThrowsException<ArgumentException>(() => testSubject.nameProperty = name);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.NameProperty = name);
     }
 }
 
@@ -71,16 +71,16 @@ public class GradeTests
         float grade = 3.5f;
         
         // Act Section
-        testSubject.examGradeProperty = grade;
-        testSubject.endingGradeProperty = grade;
-        testSubject.exceriseGradeProperty = grade;
-        testSubject.laboratoryGradeProperty = grade;
+        testSubject.ExamGradeProperty = grade;
+        testSubject.EndingGradeProperty = grade;
+        testSubject.ExceriseGradeProperty = grade;
+        testSubject.LaboratoryGradeProperty = grade;
         
         // Assert Section
-        Assert.AreEqual(grade,testSubject.examGradeProperty);
-        Assert.AreEqual(grade,testSubject.endingGradeProperty);
-        Assert.AreEqual(grade,testSubject.exceriseGradeProperty);
-        Assert.AreEqual(grade,testSubject.laboratoryGradeProperty);
+        Assert.AreEqual(grade,testSubject.ExamGradeProperty);
+        Assert.AreEqual(grade,testSubject.EndingGradeProperty);
+        Assert.AreEqual(grade,testSubject.ExceriseGradeProperty);
+        Assert.AreEqual(grade,testSubject.LaboratoryGradeProperty);
     }
     [TestMethod]
     public void Grade_Provided_Not_Correctly()
@@ -92,10 +92,10 @@ public class GradeTests
         float grade = 4.2f;
         
         // Act and Assert Section
-        Assert.ThrowsException<ArgumentException>(() => testSubject.endingGradeProperty = grade);
-        Assert.ThrowsException<ArgumentException>(() => testSubject.exceriseGradeProperty = grade);
-        Assert.ThrowsException<ArgumentException>(() => testSubject.examGradeProperty = grade);
-        Assert.ThrowsException<ArgumentException>(() => testSubject.laboratoryGradeProperty = grade);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.EndingGradeProperty = grade);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.ExceriseGradeProperty = grade);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.ExamGradeProperty = grade);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.LaboratoryGradeProperty = grade);
     }
 }
 
@@ -116,14 +116,14 @@ public class AverageTest
         double average = 0.0;
         
         // Act Section
-        testSubject.laboratoryGradeProperty = firstGrade;
-        testSubject.examGradeProperty = secondGrade;
-        testSubject.exceriseGradeProperty = thirdGrade;
+        testSubject.LaboratoryGradeProperty = firstGrade;
+        testSubject.ExamGradeProperty = secondGrade;
+        testSubject.ExceriseGradeProperty = thirdGrade;
         average = Math.Round((firstGrade + secondGrade + thirdGrade) / 3, 3);
         testSubject.AverageCalculate();
         
         // Assert Section
-        Assert.AreEqual((float)average,testSubject.averageProperty);
+        Assert.AreEqual((float)average,testSubject.AverageProperty);
     }
     [TestMethod]
     public void Average_Two_Grades()
@@ -137,12 +137,12 @@ public class AverageTest
         float gradeTwo = 3.0f;
         
         // Act Section
-        testSubject.examGradeProperty = gradeOne;
-        testSubject.laboratoryGradeProperty = gradeTwo;
+        testSubject.ExamGradeProperty = gradeOne;
+        testSubject.LaboratoryGradeProperty = gradeTwo;
         testSubject.AverageCalculate();
         float expected = (float) Math.Round((gradeOne + gradeTwo) / 2, 3);
         // Assert Section
-        Assert.AreEqual(expected,testSubject.averageProperty);
+        Assert.AreEqual(expected,testSubject.AverageProperty);
 
     }
     [TestMethod]
@@ -156,11 +156,11 @@ public class AverageTest
         float avg = 4.0f;
         
         // Act Section
-        testSubject.examGradeProperty = avg;
+        testSubject.ExamGradeProperty = avg;
         testSubject.AverageCalculate();
         
         // Assert Section
-        Assert.AreEqual(avg,testSubject.averageProperty);
+        Assert.AreEqual(avg,testSubject.AverageProperty);
     }
     [TestMethod]
     public void Average_Zero_Grades()
@@ -176,7 +176,7 @@ public class AverageTest
         testSubject.AverageCalculate();    
         
         // Assert Section
-        Assert.AreEqual(expected,testSubject.averageProperty);
+        Assert.AreEqual(expected,testSubject.AverageProperty);
 
     }
     [TestMethod]
@@ -194,7 +194,7 @@ public class AverageTest
         float[] grades = new[] {0.0f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f, 4.5f, 5.0f};
         Subject testSubject = new Subject();
         
-        Action<float> AvgStep = f =>
+        Action<float> avgStep = f =>
         {
             if (f!=0.0)
             {
@@ -207,16 +207,16 @@ public class AverageTest
         // Act Section
         
         index = gen.Next(0, 8);
-        testSubject.examGradeProperty = grades[index];
-        AvgStep(grades[index]);
+        testSubject.ExamGradeProperty = grades[index];
+        avgStep(grades[index]);
         
         index = gen.Next(0, 8);
-        testSubject.laboratoryGradeProperty = grades[index];
-        AvgStep(grades[index]);
+        testSubject.LaboratoryGradeProperty = grades[index];
+        avgStep(grades[index]);
         
         index = gen.Next(0, 8);
-        testSubject.exceriseGradeProperty = grades[index];
-        AvgStep(grades[index]);
+        testSubject.ExceriseGradeProperty = grades[index];
+        avgStep(grades[index]);
         testSubject.AverageCalculate();
         if (n != 0)
         {
@@ -228,6 +228,6 @@ public class AverageTest
         }
         
         // Assert Section
-        Assert.AreEqual(result,testSubject.averageProperty);
+        Assert.AreEqual(result,testSubject.AverageProperty);
     }
 }

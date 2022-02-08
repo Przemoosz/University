@@ -9,83 +9,83 @@ namespace University;
 
 public class Field : IData
 {
-    private string name = "None";
-    private short ectsTotal = 0;
-    private short ectsObtained = 0;
-    private short yearStarting = Convert.ToInt16(DateTime.Now.Year);
-    private short yearEnding = Convert.ToInt16(DateTime.Now.Year+3);
-    private string title = "None";
+    private string _name = "None";
+    private short _ectsTotal = 0;
+    private short _ectsObtained = 0;
+    private short _yearStarting = Convert.ToInt16(DateTime.Now.Year);
+    private short _yearEnding = Convert.ToInt16(DateTime.Now.Year+3);
+    private string _title = "None";
     // Default seted to one
     private int _fieldId = 1;
 
-    public string nameProperty
+    public string NameProperty
     {
-        get => name;
+        get => _name;
         set
         {
             if (value.Length > 255) throw new ArgumentException("Name provided is too long", value);
             else if (value.Length == 0) throw new ArgumentException("Name is not provided!", value);
-            else name = value;
+            else _name = value;
         }
     }
 
-    public short ectsTotalProperty
+    public short EctsTotalProperty
     {
-        get => ectsTotal;
+        get => _ectsTotal;
         set
         {
             if (value < 0 ) throw new ArgumentException("Ects Total can't be a negative number");
             else if (value > 200) throw new ArgumentException("Ects Total can't be higher than 200");
-            else ectsTotal = value;
+            else _ectsTotal = value;
         }
     }
-    public short ectsObtainedProperty
+    public short EctsObtainedProperty
     {
-        get => ectsTotal;
+        get => _ectsTotal;
         set
         {
             // ECTS Obtained is sum from ECTS semesters
             // WIP
-            ectsTotal = value;
+            _ectsTotal = value;
         }
     }
 
-    public short yearStartingProperty
+    public short YearStartingProperty
     {
-        get => yearStarting;
+        get => _yearStarting;
         set
         {
             if (value < DateTime.Now.Year - 7) throw new ArgumentException($"Starting year should not be lower than {DateTime.Now.Year - 7}");
             else if (value > DateTime.Now.Year + 7)
                 throw new ArgumentException($"Starting year should not be greater than {DateTime.Now.Year - 7}");
-            else yearStarting = value;
+            else _yearStarting = value;
         }
     }
 
-    public short yearEndingProperty
+    public short YearEndingProperty
     {
-        get => yearEnding;
+        get => _yearEnding;
         set
         {
-            if (value < yearStarting) throw new ArgumentException($"University ending year should not be lower than {yearStarting}");
-            else if (value > yearStarting + 7)
-                throw new ArgumentException($"University ending year should not be greater than {yearStarting +7}");
-            else yearEnding = value;
+            if (value < _yearStarting) throw new ArgumentException($"University ending year should not be lower than {_yearStarting}");
+            else if (value > _yearStarting + 7)
+                throw new ArgumentException($"University ending year should not be greater than {_yearStarting +7}");
+            else _yearEnding = value;
         }
     }
 
-    public string titleProperty
+    public string TitleProperty
     {
-        get => title;
+        get => _title;
         set
         {
             if (value != "Engineer Degree" && value != "Master Engineer Degree")
                 throw new ArgumentException("Method provided wrong value! This is unexpected! Contact developer, if this is repeating problem");
-            else title = value;
+            else _title = value;
         }
     }
 
-    public int fieldIdProperty
+    public int FieldIdProperty
     {
         set => _fieldId = value;
         get => _fieldId;
@@ -111,7 +111,7 @@ public class Field : IData
         Console.WriteLine("Field name (Must be provided, not longer than 255 letters)");
         Console.Write("Your field name: ");
         providedName = Console.ReadLine().Trim();
-        nameProperty = providedName;
+        NameProperty = providedName;
     }
 
     public void ProvideEcstTotal()
@@ -127,7 +127,7 @@ public class Field : IData
             Console.Write("Your Total ECTS: ");
             providedEctsString = Console.ReadLine().Trim();
         }
-        ectsTotalProperty = providedEcts;
+        EctsTotalProperty = providedEcts;
     }
 
     public void ProvideStartingYear()
@@ -143,14 +143,14 @@ public class Field : IData
             Console.Write("Your Total ECTS: ");
             providedStartingYearString = Console.ReadLine().Trim();
         }
-        yearStartingProperty = providedStartingYear;
+        YearStartingProperty = providedStartingYear;
     }
 
     public void ProvideEndingYear()
     {
         string providedEndingYearString;
         short providedEndingYear; 
-        Console.WriteLine($"Ending year (Must be provided, not lower than {yearStartingProperty}, not greater than than {yearStartingProperty+7})");
+        Console.WriteLine($"Ending year (Must be provided, not lower than {YearStartingProperty}, not greater than than {YearStartingProperty+7})");
         Console.Write("Your ending year: ");
         providedEndingYearString = Console.ReadLine().Trim();
         while (!Int16.TryParse(providedEndingYearString, out providedEndingYear))
@@ -159,7 +159,7 @@ public class Field : IData
             Console.Write("Your Total ECTS: ");
             providedEndingYearString = Console.ReadLine().Trim();
         }
-        yearEndingProperty = providedEndingYear;
+        YearEndingProperty = providedEndingYear;
     }
 
     public void ProvideTitle()
@@ -177,7 +177,7 @@ public class Field : IData
             providedNumber = Console.ReadLine().Trim();
         }
 
-        titleProperty = num switch
+        TitleProperty = num switch
         {
             1 => "Engineer Degree",
             2 => "Master Engineer Degree",
@@ -187,7 +187,7 @@ public class Field : IData
 
     public void CreateTable()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = @"CREATE TABLE IF NOT EXISTS fields
@@ -210,7 +210,7 @@ public class Field : IData
     public bool TableExists()
     {
         bool ret;
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='fields')";
@@ -228,7 +228,7 @@ public class Field : IData
     }
     public void DropTable()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "DROP TABLE IF EXISTS fields CASCADE;";
@@ -243,7 +243,7 @@ public class Field : IData
     public void DataInsertion()
     {
         if (!TableExists()) CreateTable();
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
         string cmd = "INSERT INTO fields VALUES(DEFAULT ,@Name, @EctsTotal, DEFAULT, @StartingYear, @EndingYear,@Title) RETURNING id;";
@@ -254,11 +254,11 @@ public class Field : IData
                 command.Parameters.Add("@StartingYear", NpgsqlDbType.Smallint);
                 command.Parameters.Add("@EndingYear", NpgsqlDbType.Smallint);
                 command.Parameters.Add("@Title", NpgsqlDbType.Varchar);
-                command.Parameters["@Name"].Value = nameProperty;
-                command.Parameters["@EctsTotal"].Value = ectsTotalProperty;
-                command.Parameters["@StartingYear"].Value = yearStartingProperty;
-                command.Parameters["@EndingYear"].Value = yearEndingProperty;
-                command.Parameters["@Title"].Value = titleProperty;
+                command.Parameters["@Name"].Value = NameProperty;
+                command.Parameters["@EctsTotal"].Value = EctsTotalProperty;
+                command.Parameters["@StartingYear"].Value = YearStartingProperty;
+                command.Parameters["@EndingYear"].Value = YearEndingProperty;
+                command.Parameters["@Title"].Value = TitleProperty;
                 try
                 {
                     Object reader = command.ExecuteScalar();
@@ -278,7 +278,7 @@ public class Field : IData
 
     public static void AllFieldsInDatabase()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "SELECT * FROM fields;";
@@ -298,7 +298,7 @@ public class Field : IData
 
     public void ShowConnectedSemesters()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "SELECT fields.id, fields.name, semester.name AS semname,semester.ectstotal, semester.ectsobtained, average FROM fields INNER JOIN semester ON fields.id = field_id;";
@@ -325,7 +325,7 @@ public class Field : IData
 
     public void ObtainedEctsRecalculate()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             short newEctsTotal = 0;
             short newEctsObtained = 0;
@@ -358,8 +358,8 @@ public class Field : IData
                 command.ExecuteNonQuery();
             }
 
-            ectsObtained = newEctsObtained;
-            ectsTotal = newEctsTotal;
+            _ectsObtained = newEctsObtained;
+            _ectsTotal = newEctsTotal;
                 connection.Close();
         }
     }
@@ -367,7 +367,7 @@ public class Field : IData
     public void LoadFieldFromDatabase()
     {
         int chosedNumber;
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             string cmd = "SELECT id,name from fields;";
             connection.Open();
@@ -402,13 +402,13 @@ public class Field : IData
                         if (reader.HasRows)
                         {
                             reader.Read();
-                            fieldIdProperty = reader.GetInt32(0);
-                            nameProperty = reader.GetString(1);
-                            ectsTotalProperty = reader.GetInt16(2);
-                            ectsObtainedProperty = reader.GetInt16(3);
-                            yearStartingProperty = reader.GetInt16(4);
-                            yearEndingProperty = reader.GetInt16(5);
-                            titleProperty = reader.GetString(6);
+                            FieldIdProperty = reader.GetInt32(0);
+                            NameProperty = reader.GetString(1);
+                            EctsTotalProperty = reader.GetInt16(2);
+                            EctsObtainedProperty = reader.GetInt16(3);
+                            YearStartingProperty = reader.GetInt16(4);
+                            YearEndingProperty = reader.GetInt16(5);
+                            TitleProperty = reader.GetString(6);
                         }
                         reader.Close();
                     }

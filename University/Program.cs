@@ -8,12 +8,15 @@ namespace University
         {
             // bool[] t = new bool[2] {false, false};
             // bool[] s = new bool[2] {false, false};
+            
             Subject s = new Subject();
-            s.examGradeProperty = 2.0f;
-            s.exceriseGradeProperty = 4.5f;
-            s.laboratoryGradeProperty = 2.5f;
-            s.AverageCalculate();
-            Console.WriteLine(s.averageProperty);
+            // s.ExamGradeProperty = 2.0f;
+            // s.ExceriseGradeProperty = 4.5f;
+            // s.LaboratoryGradeProperty = 2.5f;
+            s.DataInsertion();
+            // s.AverageCalculate();
+            //
+            // Console.WriteLine(s.AverageProperty);
             // Field newField = new Field();
             // newField.CreateField();
             // newField.LoadFieldFromDatabase();
@@ -22,9 +25,12 @@ namespace University
             // newField.DropTable();
             // newField.CreateTable();
             // newField.CreateField();
-            // Semester newSemester = new Semester("ED", 1);
-            // newSemester.DropTable();
+            //Semester newSemester = new Semester("ED", 1);
+            //newSemester.CreateSemester();
+            // newSemester.DataInsertion();
+            //newSemester.DropTable();
             // newSemester.CreateTable();
+            // s.CreateTable();
             // newSemester.CreateSemester();
             // newSemester.CreateSemester();
             // newField.ShowConnectedSemesters();

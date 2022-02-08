@@ -21,7 +21,7 @@ public class Semester: IData
         _title = title;
         _fieldIdReference = fieldInt;
     }
-    public string nameProperty
+    public string NameProperty
     { 
         get => _name;
         set
@@ -57,7 +57,7 @@ public class Semester: IData
         } 
     }
 
-    public short ectsTotalProperty
+    public short EctsTotalProperty
     {
         get => _ectsTotal;
         set
@@ -69,7 +69,7 @@ public class Semester: IData
     }
     public void CreateTable()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string command = @"CREATE TABLE IF NOT EXISTS semester 
@@ -121,7 +121,7 @@ public class Semester: IData
                 throw new Exception("Provided wrong number. Numbers must higher than 0 and lower than 8!");
             }
 
-            nameProperty = number switch
+            NameProperty = number switch
             {
                 1 => "Semester I",
                 2 => "Semester II",
@@ -150,7 +150,7 @@ public class Semester: IData
                 throw new Exception("Provided wrong number. Numbers must higher than 0 and lower than 4!");
             }
 
-            nameProperty = number switch
+            NameProperty = number switch
             {
                 1 => "Semester I",
                 2 => "Semester II",
@@ -175,7 +175,7 @@ public class Semester: IData
             Console.Write("Your Total ECTS: ");
             providedEctsString = Console.ReadLine().Trim();
         }
-        ectsTotalProperty = providedEcts;
+        EctsTotalProperty = providedEcts;
     }
 
     public void CreateSemester()
@@ -187,7 +187,7 @@ public class Semester: IData
 
     public void DropTable()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "DROP TABLE IF EXISTS semester CASCADE";
@@ -200,7 +200,7 @@ public class Semester: IData
     public bool TableExists()
     {
         bool exists;
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='semester')";
@@ -214,7 +214,7 @@ public class Semester: IData
 
     public void DataInsertion()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
             string cmd =
@@ -224,8 +224,8 @@ public class Semester: IData
                 command.Parameters.Add("@Name", NpgsqlDbType.Varchar);
                 command.Parameters.Add("@EctsTotal", NpgsqlDbType.Smallint);
                 command.Parameters.Add("@IdReference", NpgsqlDbType.Integer);
-                command.Parameters["@Name"].Value = nameProperty;
-                command.Parameters["@EctsTotal"].Value = ectsTotalProperty;
+                command.Parameters["@Name"].Value = NameProperty;
+                command.Parameters["@EctsTotal"].Value = EctsTotalProperty;
                 command.Parameters["@IdReference"].Value = _fieldIdReference;
                 try
                 {
@@ -246,7 +246,7 @@ public class Semester: IData
 
     public void FetchDataFromDb()
     {
-        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.getDefaultConnectionString()))
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             
             string cmd = "SELECT * FROM semester;";
