@@ -96,7 +96,10 @@ public class Field : IData
     }
     public void CreateField()
     {
-        
+        if (!TableExists())
+        {
+            CreateTable();
+        }
         ProvideName();
         ProvideEcstTotal();
         ProvideStartingYear();

@@ -180,6 +180,10 @@ public class Semester: IData
 
     public void CreateSemester()
     {
+        if (!this.TableExists())
+        {
+            CreateTable();
+        }
         ProvideName();
         ProvideEctsTotal();
         DataInsertion();

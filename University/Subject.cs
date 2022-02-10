@@ -5,7 +5,7 @@ namespace University;
 
 public class Subject : IData
 {
-    private string _name = "3dsadasd";
+    private string _name = "None";
     private short _ects = 32;
     private float _average =0.0f;
     private float _endingGrade = 0.0f;
@@ -15,6 +15,14 @@ public class Subject : IData
     private int _subjectId;
     private int _semester_id = 1;
 
+    public Subject()
+    {
+        
+    }
+    public Subject(int semId)
+    {
+        _semester_id = semId;
+    }
     public string NameProperty
     {
         get { return _name; }
@@ -131,7 +139,7 @@ public class Subject : IData
                 command.Parameters["@END"].Value = (double) EndingGradeProperty;
                 command.Parameters["@EXAM"].Value = (double) ExamGradeProperty;
                 command.Parameters["@LAB"].Value = (double) LaboratoryGradeProperty;
-                command.Parameters["@EXE"].Value = (double) ExceriseGradeProperty;
+                command.Parameters["@EXE"].Value = (double) ExerciseGradeProperty;
                 command.Parameters["@REFERENCEID"].Value = _semester_id;
                 try
                 {
@@ -184,7 +192,7 @@ public class Subject : IData
         set => _laboratoryGrade = GradeSetLogic(value);
 
     }
-    public float ExceriseGradeProperty
+    public float ExerciseGradeProperty
     {
         get => _exerciseGrade;
         set => _exerciseGrade = GradeSetLogic(value);
@@ -244,5 +252,39 @@ public class Subject : IData
             AverageProperty =(float) Math.Round((sum / n),3);
         }
         else AverageProperty = 0.0f;
+    }
+
+    public void FetchAllDataFromTable()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT * FROM subjects;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+
+                try
+                {
+                    NpgsqlDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        Console.WriteLine("Id - Name - Ects - Average - EndingGrade - ExamGrade - LabGrade - ExeGrade - ConnectedSemId");
+                        while (reader.Read())
+                        {
+                            Console.WriteLine($"{reader.GetInt32(0)} - {reader.GetString(1)} - {reader.GetInt32(2)} - {reader.GetDouble(3)}" +
+                                              $" - {reader.GetDouble(4)}" +
+                                              $" - {reader.GetDouble(5)}" + $" - {reader.GetDouble(6)}" + $" - {reader.GetDouble(7)} - {reader.GetInt32(8)}");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    connection.Close();
+                    throw;
+                }
+            }
+            connection.Close();
+        }
     }
 }

@@ -1,6 +1,8 @@
 using System;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using University;
+using Npgsql;
 
 namespace SubjectTest;
 
@@ -73,13 +75,13 @@ public class GradeTests
         // Act Section
         testSubject.ExamGradeProperty = grade;
         testSubject.EndingGradeProperty = grade;
-        testSubject.ExceriseGradeProperty = grade;
+        testSubject.ExerciseGradeProperty = grade;
         testSubject.LaboratoryGradeProperty = grade;
         
         // Assert Section
         Assert.AreEqual(grade,testSubject.ExamGradeProperty);
         Assert.AreEqual(grade,testSubject.EndingGradeProperty);
-        Assert.AreEqual(grade,testSubject.ExceriseGradeProperty);
+        Assert.AreEqual(grade,testSubject.ExerciseGradeProperty);
         Assert.AreEqual(grade,testSubject.LaboratoryGradeProperty);
     }
     [TestMethod]
@@ -93,7 +95,7 @@ public class GradeTests
         
         // Act and Assert Section
         Assert.ThrowsException<ArgumentException>(() => testSubject.EndingGradeProperty = grade);
-        Assert.ThrowsException<ArgumentException>(() => testSubject.ExceriseGradeProperty = grade);
+        Assert.ThrowsException<ArgumentException>(() => testSubject.ExerciseGradeProperty = grade);
         Assert.ThrowsException<ArgumentException>(() => testSubject.ExamGradeProperty = grade);
         Assert.ThrowsException<ArgumentException>(() => testSubject.LaboratoryGradeProperty = grade);
     }
@@ -113,12 +115,12 @@ public class AverageTest
         float firstGrade = 2.0f;
         float secondGrade = 2.5f;
         float thirdGrade = 4.5f;
-        double average = 0.0;
+        double average;
         
         // Act Section
         testSubject.LaboratoryGradeProperty = firstGrade;
         testSubject.ExamGradeProperty = secondGrade;
-        testSubject.ExceriseGradeProperty = thirdGrade;
+        testSubject.ExerciseGradeProperty = thirdGrade;
         average = Math.Round((firstGrade + secondGrade + thirdGrade) / 3, 3);
         testSubject.AverageCalculate();
         
@@ -185,9 +187,9 @@ public class AverageTest
         // Testing Random input average calculate
         
         // Arrange Section
-        int index = 0;
+        int index;
         int n = 0;
-        float result = 0.0f;
+        float result;
         float sum = 0.0f;
         
         Random gen = new Random();
@@ -215,7 +217,7 @@ public class AverageTest
         avgStep(grades[index]);
         
         index = gen.Next(0, 8);
-        testSubject.ExceriseGradeProperty = grades[index];
+        testSubject.ExerciseGradeProperty = grades[index];
         avgStep(grades[index]);
         testSubject.AverageCalculate();
         if (n != 0)
@@ -229,5 +231,187 @@ public class AverageTest
         
         // Assert Section
         Assert.AreEqual(result,testSubject.AverageProperty);
+    }
+}
+
+[TestClass]
+public class DataBaseTest
+{
+    // Testing all methods connected with database
+    // We assume that TestUtils return always true values
+
+    [AssemblyInitialize]
+    public static void AssemblyInit(TestContext context)
+    {
+        // Initialize test class
+        TestUtils.TableDrop("field");
+        TestUtils.TableDrop("semester");
+        TestUtils.TableDrop("subjects");
+        
+        // Creating default field and default semester table
+        Field field = new Field();
+        field.CreateTable();
+        field.DataInsertion();
+        Semester semester = new Semester("ED", 1);
+        semester.CreateTable();
+        semester.DataInsertion();
+    }
+
+    [TestMethod]
+    public void Testing_Table_Creation()
+    {
+        // Testing create table method
+        // Method should create table in database
+        
+        // Arrange Section
+        Subject testSubject = new Subject();
+
+        // Act Section
+        if (TestUtils.TableExists())
+        {
+            throw new Exception("Table already exists. Re-run test class or contact developer");
+        }
+        testSubject.CreateTable();
+        
+        // Assert Section
+        Assert.AreEqual(true,TestUtils.TableExists());
+    }
+
+    [TestMethod]
+    public void Testing_Table_Drop()
+    {
+        // Testing drop table method from subject object
+        // method should drop existing database
+        
+        // Arrange Section
+        Subject testSubject = new Subject();
+
+        TestUtils.CreateSimpleTableToDrop();
+        
+        // Act Section
+        if (!TestUtils.TableExists())
+            throw new Exception(
+                "Table 'subjects' should exists. Contact developer to fix the problem, or check postgresql settings");
+        testSubject.DropTable();
+                
+        // Assert Section
+        Assert.AreEqual(false,TestUtils.TableExists());
+    }
+
+    [TestMethod]
+    public void Testing_Table_Exists()
+    {
+        // Testing exists method from subject object
+        // method should return true because table will exist
+        
+        // Arrange Section
+        Subject testSubject = new Subject();
+        TestUtils.CreateSimpleTableToDrop();
+        bool result;
+        
+        // Act Section
+        result = testSubject.TableExists();
+
+        // Assert Section
+        Assert.AreEqual(true, result);
+    }
+
+    [TestMethod]
+    public void Testing_Table_Not_Exists()
+    {
+        // Testing exists method from subject object
+        // method should return true because table will exist
+        
+        // Arrange Section
+        Subject testSubject = new Subject();
+        TestUtils.TableDrop("subjects");
+        bool result;
+        
+        // Act Section
+        result = testSubject.TableExists();
+
+        // Assert Section
+        Assert.AreEqual(false, result);
+    }
+
+    [TestMethod]
+    public void Testing_Insertion_To_Table()
+    {
+        // Testing insertion. First methods catch data from user, then method insert those data
+        // to DataBase. After fetching, data should not be changed.
+        
+        // Arrange Section
+        Subject testSubject = new Subject();
+        string testName = "Test";
+        short testEcts = 8;
+        float testAverage;
+        float testExam = 3.0f;
+        float testLab = 2.5f;
+        float testExe = 4.5f;
+        float testEnd = 5.0f;
+        int testSubjectId = 1;
+        testSubject.CreateTable();
+        testSubject.NameProperty = testName;
+        testSubject.EctsProperty = testEcts;
+        testSubject.ExamGradeProperty = testExam;
+        testSubject.LaboratoryGradeProperty = testLab;
+        testSubject.ExerciseGradeProperty = testExe;
+        testSubject.EndingGradeProperty = testEnd;
+        testSubject.AverageCalculate();
+        testAverage = testSubject.AverageProperty;
+        
+        // Act Section 
+        testSubject.DataInsertion();
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            string cmd = "SELECT * FROM subjects;";
+            connection.Open();
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            { 
+                // Assert Section
+                try
+                {
+                    NpgsqlDataReader reader = command.ExecuteReader();
+                    if (reader.HasRows)
+                    {
+                        while (reader.Read())
+                        {
+                            Assert.AreEqual(testSubjectId, reader.GetInt32(0));
+                            Assert.AreEqual(testName, reader.GetString(1));
+                            Assert.AreEqual(testEcts,reader.GetInt16(2));
+                            Assert.AreEqual(testAverage, (float) reader.GetDouble(3));
+                            Assert.AreEqual(testEnd, (float) reader.GetDouble(4));
+                            Assert.AreEqual(testExam, (float) reader.GetDouble(5));
+                            Assert.AreEqual(testLab, (float) reader.GetDouble(6));
+                            Assert.AreEqual(testExe, (float) reader.GetDouble(7));
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+                finally
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+    }
+    [TestCleanup]
+    public void TestCleanUp()
+    {
+        // Cleanup after each test
+        TestUtils.TableDrop("subjects");
+    }
+    [AssemblyCleanup]
+    public static void AssemblyCleanUp()
+    {
+        // After tests cleanup
+        TestUtils.TableDrop("field");
+        TestUtils.TableDrop("semester");
+        TestUtils.TableDrop("subjects");
     }
 }
