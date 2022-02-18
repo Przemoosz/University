@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection.Metadata;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Npgsql;
 using University;
@@ -196,7 +197,16 @@ public class DatabaseTest
         testField.DataInsertion();
         // https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/ms245265(v=vs.120)
     }
-    
+
+    // [TestInitialize]
+    // public void TestInit()
+    // {
+    //     TestUtils.TableDrop();
+    //     Field testField = new Field();
+    //     testField.DropTable();
+    //     testField.CreateTable();
+    //     testField.DataInsertion();
+    // }
     [TestMethod]
     public void Testing_Table_Creation()
     {

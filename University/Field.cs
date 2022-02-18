@@ -92,7 +92,7 @@ public class Field : IData
     }
     public Field()
     {
-        //CreateTable();
+
     }
     public void CreateField()
     {
@@ -222,7 +222,26 @@ public class Field : IData
                 var result = command.ExecuteScalar();
                 string res = result.ToString();
                 ret = Convert.ToBoolean(res);
-                Console.WriteLine(ret);
+                // Console.WriteLine(ret);
+            }
+            connection.Close();
+        }
+
+        return ret;
+    }
+    public static bool TableExistsStatic()
+    {
+        bool ret;
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='fields')";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                var result = command.ExecuteScalar();
+                string res = result.ToString();
+                ret = Convert.ToBoolean(res);
+                // Console.WriteLine(ret);
             }
             connection.Close();
         }
@@ -279,8 +298,9 @@ public class Field : IData
         }
     }
 
-    public static void AllFieldsInDatabase()
+    public static int AllFieldsInDatabase()
     {
+        int rows = 0;
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
         {
             connection.Open();
@@ -293,10 +313,15 @@ public class Field : IData
                 foreach (var _ in result)
                 {
                     Console.WriteLine($"{result.GetInt32(0)} -- {result.GetString(1)} -- {result.GetInt16(2)} -- {result.GetInt16(3)} -- {result.GetInt16(4)} -- {result.GetInt16(5)} -- {result.GetString(6)}");
+                    rows = result.GetInt32(0);
                 }
+
+                
             }
             connection.Close();
         }
+
+        return rows;
     }
 
     public void ShowConnectedSemesters()

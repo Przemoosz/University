@@ -2,7 +2,7 @@
 using NpgsqlTypes;
 namespace University;
 
-public class Semester: IData
+public sealed class Semester: IData
 {
     private string _name  = "None";
     private short _ectsTotal = 0;
@@ -11,15 +11,41 @@ public class Semester: IData
     private string _title;
     private int _fieldIdReference;
     private int _semesterId;
+
+    public Semester()
+    {
+        
+    }
     public Semester(string title)
     {
-        _title = title;
+        TitleProperty = title;
     }
 
     public Semester(string title, int fieldInt)
     {
         _title = title;
         _fieldIdReference = fieldInt;
+    }
+
+    public string TitleProperty
+    {
+        get => _title;
+        set
+        {
+            if (value.Equals("Engineer Degree"))
+            {
+                _title = "ED";
+            }
+            else if (value.Equals("Master Engineer Degree"))
+            {
+                _title = "MED";
+            }
+            else
+            {
+                // TODO
+                throw new ArgumentException("Something went Wrong!");
+            }
+        }
     }
     public string NameProperty
     { 
@@ -184,7 +210,7 @@ public class Semester: IData
         {
             CreateTable();
         }
-        ProvideName();
+        
         ProvideEctsTotal();
         DataInsertion();
     }
@@ -202,6 +228,20 @@ public class Semester: IData
     }
 
     public bool TableExists()
+    {
+        bool exists;
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT EXISTS(SELECT FROM pg_tables WHERE schemaname='public' AND tablename='semester')";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+                exists = Convert.ToBoolean(command.ExecuteScalar().ToString());
+            connection.Close();
+        }
+        Console.WriteLine(exists);
+        return exists;
+    }
+    public static bool TableExistsStatic()
     {
         bool exists;
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
@@ -267,5 +307,148 @@ public class Semester: IData
             }
 
         }        
+    }
+
+    public void ConnectToField(IDataInput dataInput)
+    {
+        // Using Dependency Injection to take input from console
+        int rows;
+        try
+        {
+            rows = Field.AllFieldsInDatabase();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Fields probably does not exists! Contact Developer to fix problem, or re run setup");
+            Console.WriteLine(e);
+            throw;
+        }
+        
+        Console.WriteLine("Type Id of Filed to connect: ");
+        string receivedData = dataInput.GetInput();
+        int id;
+        if (Int32.TryParse(receivedData, out id))
+        {
+            if (id > rows || id <= 0)
+            {
+                throw new Exception("Id Can not be lowe than zero or higher than max Id");
+            }
+            _fieldIdReference = id;
+        }
+        else
+        {
+            throw new Exception("Can not Convert to Integer data type!");
+        }
+        Console.WriteLine(rows);
+    }
+
+    public static int AllSemesterInDatabase()
+    {
+        int rows = 0;
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd = "SELECT * FROM semester;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd,connection))
+            {
+                NpgsqlDataReader reader = command.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    Console.WriteLine("Id -- Name -- EctsTotal -- EctsObtained -- Average -- FieldReferenceID");
+                    while (reader.Read())
+                    {
+                        Console.WriteLine($"{reader.GetInt32(0)} -- {reader.GetString(1)} -- {reader.GetInt16(2)} -- {reader.GetInt16(3)} -- {reader.GetDouble(4)} -- {reader.GetInt32(5)}");
+                        rows++;
+                    }  
+                }
+                reader.Close();
+            }
+            connection.Close();
+        }
+        return rows;
+    }
+
+    public void LoadDataFromDatabase(IDataInput dataInput)
+    {
+        int maxId = 0;
+        int choosed;
+        // Not tested
+        using (NpgsqlConnection connection= new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd =
+                "SELECT semester.id AS sem_id, semester.name AS sem_name, fields.name AS field_name FROM SEMESTER INNER JOIN fields ON field_id = fields.id;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                
+                using (NpgsqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        Console.WriteLine("sem_id -- sem_name -- field_name");
+                        while (reader.Read())
+                        {
+                            Console.WriteLine($"{reader.GetInt32(0)} -- {reader.GetString(1)} -- {reader.GetString(2)}");
+                            maxId = reader.GetInt32(0);
+                        }
+                    
+                    }
+                    else
+                    {
+                        connection.Close();
+                        Console.WriteLine("There is no rows in table! Create some semester and save it to database");
+                        throw new Exception("NO rows available");
+                    }
+                }
+            }
+            Console.WriteLine("Choose Id number to load semseter: ");
+            string choosedString = dataInput.GetInput();
+            if (Int32.TryParse(choosedString, out choosed))
+            {
+                if (choosed > maxId || choosed <= 0)
+                {
+                    throw new Exception("Choosed wrong Id!");
+                }
+            }
+            else
+            {
+                throw new Exception("Cant parse input to Int32!");
+            }
+            // TODO
+            // Change select to select with inner join and get title name!
+            cmd = $"SELECT * FROM semester WHERE id = {choosed};";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd, connection))
+            {
+                try
+                {
+                    using (NpgsqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.HasRows)
+                        {
+                            reader.Read();
+                            // To remove!
+                            _title = "ED";
+                            _semesterId = reader.GetInt32(0);
+                            NameProperty = reader.GetString(1);
+                            EctsTotalProperty = reader.GetInt16(2);
+                            // TODO
+                            // Property to implement!
+                            _ectsObtained = reader.GetInt16(3);
+                            // Property to implement!
+                            _average = (float) reader.GetDouble(4);
+                            _fieldIdReference = reader.GetInt32(5);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }
+            connection.Close();
+        }
+
+        
     }
 }

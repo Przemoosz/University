@@ -3,7 +3,7 @@ using NpgsqlTypes;
 
 namespace University;
 
-public class Subject : IData
+public sealed class Subject : IData
 {
     private string _name = "None";
     private short _ects = 32;
@@ -13,7 +13,7 @@ public class Subject : IData
     private float _laboratoryGrade = 0.0f;
     private float _exerciseGrade = 0.0f;
     private int _subjectId;
-    private int _semester_id = 1;
+    private int _semester_id;
 
     public Subject()
     {
@@ -22,6 +22,20 @@ public class Subject : IData
     public Subject(int semId)
     {
         _semester_id = semId;
+    }
+
+    public void CreateSubject()
+    {
+        if (!this.TableExists())
+        {
+            CreateTable();
+        }
+        ProvideNameDependencyInjection(new GetInputClass());
+        ProvideEcts(new GetInputClass());
+        ProvideGrades(dataInput:new GetInputClass());
+        ConnectToSemester(new GetInputClass());
+        AverageCalculate();
+        DataInsertion();
     }
     public string NameProperty
     {
@@ -39,9 +53,65 @@ public class Subject : IData
 
     public void ProvideName()
     {
+        // Not implemented
         throw new NotImplementedException();
     }
 
+    public void ProvideEcts(IDataInput dataInput)
+    {
+        string providedEctsString;
+        short providedEcts; 
+        Console.WriteLine("Total ECTS (Must be provided, not less than 0, not higher than 10)");
+        Console.Write("Your Total ECTS: ");
+        providedEctsString = dataInput.GetInput();
+        while (!Int16.TryParse(providedEctsString, out providedEcts))
+        {
+            Console.WriteLine("Provided wrong number! Try again.");
+            Console.Write("Your Total ECTS: ");
+            providedEctsString = dataInput.GetInput();
+        }
+        EctsProperty= providedEcts;        
+    }
+    public void ProvideGrades(IDataInput dataInput)
+    {
+        // Not tested
+        Console.WriteLine("Provide Grades, type 0.0 if you dont have laboratory for example, grades from 2,0 to 5,0 Half grades are supported using ',' ");
+        Dictionary<string, float> providedGrades = new Dictionary<string, float>(4);
+        List<string> names = new List<string>(4) {"Exercise", "Laboratory", "Exam", "Ending"};
+        string input;
+        float output;
+        foreach (string name in names)
+        {
+            Console.WriteLine($"Provide Grade for {name}: ");
+            input = dataInput.GetInput();
+            if (float.TryParse(input, out output))
+            {
+                providedGrades.Add(name,output);
+            }
+            else
+            {
+                throw new Exception("Provided Wrong Grade. See Rules for grade above!");
+            }
+            
+        }
+
+        ExerciseGradeProperty = providedGrades["Exercise"];
+        LaboratoryGradeProperty = providedGrades["Laboratory"];
+        ExamGradeProperty = providedGrades["Exam"];
+        EndingGradeProperty = providedGrades["Ending"];
+    }   
+    public void ProvideNameDependencyInjection(IDataInput dataInput)
+    {
+        // Not tested
+        
+        Console.WriteLine("Provide Name (Not longer than 100 letters, can not be empty): ");
+        string inp = dataInput.GetInput();
+        // if (inp.Length > 100 || inp.Length <= 0)
+        // {
+        //     throw new Exception("Name should not be empty and not loneger than 100 letters");
+        // }
+        NameProperty = inp;
+    }
     public void CreateTable()
     {
         using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
@@ -113,7 +183,7 @@ public class Subject : IData
                 exists = Convert.ToBoolean(command.ExecuteScalar().ToString());
             connection.Close();
         }
-        Console.WriteLine(exists);
+        // Console.WriteLine(exists);
         return exists;
     }
 
@@ -246,7 +316,7 @@ public class Subject : IData
             sum += _exerciseGrade;
             n++;
         }
-        Console.WriteLine(sum);
+        // Console.WriteLine(sum);
         if (n != 0)
         {
             AverageProperty =(float) Math.Round((sum / n),3);
@@ -285,6 +355,28 @@ public class Subject : IData
                 }
             }
             connection.Close();
+        }
+    }
+
+    public void ConnectToSemester(IDataInput dataInput)
+    {
+        int avaibleSemesters = Semester.AllSemesterInDatabase();
+        int choosedSemester;
+        Console.WriteLine("Type Semester Id number to connect Subject: ");
+        if (Int32.TryParse(dataInput.GetInput(), out choosedSemester))
+        {
+            if (choosedSemester > avaibleSemesters || choosedSemester <= 0)
+            {
+                throw new Exception($"Provided ID can not be higher than {avaibleSemesters} or lower than 0!");
+            }
+            else
+            {
+                _semester_id = choosedSemester;
+            }
+        }
+        else
+        {
+            throw new Exception("Cant Parse input to Int32");
         }
     }
 }
