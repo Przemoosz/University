@@ -341,7 +341,7 @@ public class DataBaseTest
         // to DataBase. After fetching, data should not be changed.
         
         // Arrange Section
-        Subject testSubject = new Subject();
+        Subject testSubject = new Subject(1);
         string testName = "Test";
         short testEcts = 8;
         float testAverage;

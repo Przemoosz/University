@@ -4,6 +4,14 @@ public sealed class GetInputClass:IDataInput
 {
     public string GetInput()
     {
-        return Console.ReadLine().Trim();
+        string? ret = Console.ReadLine().Trim();
+        if (ret is not null)
+        {
+            return ret;
+        }
+        else
+        {
+            return "";
+        }
     }
 }

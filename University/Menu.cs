@@ -90,10 +90,28 @@ public static class Menu
 
         if (!Semester.TableExistsStatic())
         {
-            Console.WriteLine("There is no smester table! Create new and return here");
+            Console.WriteLine("There is no semester table! Create new and return here");
             return;
         }
         field.LoadFieldFromDatabase();
         field.ShowConnectedSemesters();
+    }
+
+    public static void ShowConnectedSubjcts()
+    {
+        Semester semester = new Semester();
+        if (!Field.TableExistsStatic())
+        {
+            Console.WriteLine("Table Fields does not exists!");
+            return;
+        }
+
+        if (!Semester.TableExistsStatic())
+        {
+            Console.WriteLine("Table Semester does not exists!");
+            return;
+        }
+        
+        semester.ShowConnectedSubjects();
     }
 }

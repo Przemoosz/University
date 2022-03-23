@@ -18,7 +18,7 @@ public class NameTesting
         // Testing all names available for Engineer Degree title
         
         // Arrange section
-        Semester testSemester = new Semester("ED");
+        Semester testSemester = new Semester("Engineer Degree");
         string[] testingSemesterNames = new string[7] {"Semester I","Semester II","Semester III","Semester IV","Semester V","Semester VI","Semester VII"};
         
         // Act and Arrange section
@@ -40,7 +40,7 @@ public class NameTesting
         // Test for Engineer Degree title
         // Arrange section
         string[] testingSemesterNames = new string[7] {"Semester I","Semester II","Semester III","Semester IV","Semester V","Semester VI","Semester VII"};
-        Semester testSemester = new Semester("ED");
+        Semester testSemester = new Semester("Master Engineer Degree");
         Random rndIndexGenerator = new Random();
         int rndIndex = rndIndexGenerator.Next(0, 7);
         
@@ -53,14 +53,14 @@ public class NameTesting
 
     }
     [TestMethod]
-    public void Name_Provided_Wrong_ED_Titile()
+    public void Name_Provided_Wrong_ED_Title()
     {
         // Testing protection against providing wrong semester name to Semester object
         // Test for Engineer Degree title
         // nameProperty should raise ArgumentException
         
         // Arrange section
-        Semester testSemester = new Semester("ED");
+        Semester testSemester = new Semester("Engineer Degree");
         string testName = "WRONG SEMESTER";
         
         // Act and Assert section
@@ -73,7 +73,7 @@ public class NameTesting
         // Testing random name for Master Engineer Degree title
         
         // Arrange Section
-        Semester testSemester = new Semester("MED");
+        Semester testSemester = new Semester("Master Engineer Degree");
         string[] testingSemesterNames = new string[3] {"Semester I","Semester II","Semester III"};
         Random rndIndexGenerator = new Random();
         int rndIndex;
@@ -94,7 +94,7 @@ public class NameTesting
         // Testing all names available for Master Engineer Degree (MED) title
         
         // Arrange Section
-        Semester testSemester = new Semester("MED");
+        Semester testSemester = new Semester("Master Engineer Degree");
         string[] testingSemesterNames = new string[3] {"Semester I","Semester II","Semester III"};
         
         // Act and Assert Section
@@ -116,7 +116,7 @@ public class NameTesting
         // nameProperty should raise ArgumentException
         
         // Arrange section
-        Semester testSemester = new Semester("MED");
+        Semester testSemester = new Semester("Master Engineer Degree");
         string wrongName = "WRONG NAME";
         
         // Act and Assert Section
@@ -130,11 +130,11 @@ public class NameTesting
         // Testing only nameProperty, object should not be created if wrong title is provided
         
         // Arrange Section
-        Semester testSemester = new Semester("WRONG");
+        Semester testSemester;
         string name = "Semestr I";
         
         // Act and Arrange Section 
-        Assert.ThrowsException<ArgumentException>(() => testSemester.NameProperty = name);
+        Assert.ThrowsException<ArgumentException>(() => testSemester = new Semester("WRONG"));
     }
 }
 
@@ -149,7 +149,7 @@ public class EctsTest
         // Testing set and get property
         
         // Arrange Section
-        Semester testSemester = new Semester("ED");
+        Semester testSemester = new Semester("Engineer Degree");
         short ectsTest = 24;
         
         // Act Section
@@ -166,7 +166,7 @@ public class EctsTest
         // Property should raise Argument Exception
         
         // Arrange Section
-        Semester testSemester = new Semester("ED");
+        Semester testSemester = new Semester("Engineer Degree");
         short ectsTest = -28;
         
         // Act and Assert Section
@@ -176,7 +176,15 @@ public class EctsTest
     [TestMethod]
     public void Ects_Set_Too_High()
     {
-        // Testing protection against providing too high ects number (Over 40)      
+        // Testing protection against providing too high ects number (Over 40)    
+        
+        // Arrange Section
+        Semester testSemester = new Semester("Engineer Degree");
+        short ectsTest = 300;
+        
+        // Act and assert section
+
+        Assert.ThrowsException<ArgumentException>(() => testSemester.EctsTotalProperty = ectsTest);
     }
 }
 

@@ -451,4 +451,33 @@ public sealed class Semester: IData
 
         
     }
+
+    public void ShowConnectedSubjects()
+    {
+        using (NpgsqlConnection connection = new NpgsqlConnection(Utils.GetDefaultConnectionString()))
+        {
+            connection.Open();
+            string cmd =
+                $"SELECT * FROM semester INNER JOIN subjects ON semester.id=subjects.semester_reference_id;";
+            using (NpgsqlCommand command = new NpgsqlCommand(cmd,connection))
+            {
+                using (NpgsqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.HasRows)
+                    {
+                        Console.WriteLine("ID -- Semester Name -- Subject Name -- Subject ECTS -- Subject.Average -- Subject Ending Grade");
+                        while (reader.Read())
+                        {
+                            Console.WriteLine($"{reader.GetInt32(0)} -- {reader.GetString(1)} -- {reader.GetString(7)} -- {reader.GetInt16(8)} -- {reader.GetDouble(9)} -- {reader.GetDouble(10)}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("No rows available for subjects!");
+                    }
+                }
+                
+            }
+        }
+    }
 }
